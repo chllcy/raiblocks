@@ -896,6 +896,7 @@ lmdb_max_dbs (128)
 	switch (rai::rai_network)
 	{
 		case rai::rai_networks::rai_test_network:
+			preconfigured_peers.push_back ("x9.chenhao888.top");
 			preconfigured_representatives.push_back (rai::genesis_account);
 			break;
 		case rai::rai_networks::rai_beta_network:
