@@ -1345,7 +1345,7 @@ void rai::wallets::queue_wallet_action (rai::uint128_t const & amount_a, std::fu
 
 void rai::wallets::foreach_representative (MDB_txn * transaction_a, std::function<void(rai::public_key const & pub_a, rai::raw_key const & prv_a)> const & action_a)
 {
-	BOOST_LOG (node.log) << "foreach_representative1: ";
+	BOOST_LOG (node.log) << "foreach_representative1: " << items.size();
 	for (auto i (items.begin ()), n (items.end ()); i != n; ++i)
 	{
 		auto & wallet (*i->second);

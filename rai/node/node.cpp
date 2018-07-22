@@ -189,6 +189,7 @@ bool confirm_block (MDB_txn * transaction_a, rai::node & node_a, T & list_a, std
 				rai::vectorstream stream (*bytes);
 				confirm.serialize (stream);
 			}
+			BOOST_LOG (node_a.log) << "confirm_block:" << list_a.size();
 			for (auto j (list_a.begin ()), m (list_a.end ()); j != m; ++j)
 			{
 				node_a.network.confirm_send (confirm, bytes, *j);
@@ -209,6 +210,7 @@ bool confirm_block (MDB_txn * transaction_a, rai::node & node_a, rai::endpoint &
 
 void rai::network::republish_block (MDB_txn * transaction, std::shared_ptr<rai::block> block)
 {
+	BOOST_LOG (node.log) << "rai::network::republish_block";
 	auto hash (block->hash ());
 	auto list (node.peers.list_fanout ());
 	// If we're a representative, broadcast a signed confirm, otherwise an unsigned publish
@@ -1433,6 +1435,7 @@ void rai::block_processor::process_receive_many (std::unique_lock<std::mutex> & 
 
 rai::process_return rai::block_processor::process_receive_one (MDB_txn * transaction_a, std::shared_ptr<rai::block> block_a, std::chrono::steady_clock::time_point origination)
 {
+	BOOST_LOG (node.log) << "rai::block_processor::process_receive_one";
 	rai::process_return result;
 	auto hash (block_a->hash ());
 	result = node.ledger.process (transaction_a, *block_a);

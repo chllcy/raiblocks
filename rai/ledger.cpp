@@ -182,30 +182,37 @@ void ledger_processor::state_block (rai::state_block const & block_a)
 
 void ledger_processor::state_block_impl (rai::state_block const & block_a)
 {
+	std::cerr << "ledger_processor::state_block1 "<< std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block before? (Unambiguous)
 	if (result.code == rai::process_result::progress)
 	{
+		std::cerr << "ledger_processor::state_block2 "<< std::endl;
 		result.code = validate_message (block_a.hashables.account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Unambiguous)
 		if (result.code == rai::process_result::progress)
 		{
+			std::cerr << "ledger_processor::state_block3 "<< std::endl;
 			result.code = block_a.hashables.account.is_zero () ? rai::process_result::opened_burn_account : rai::process_result::progress; // Is this for the burn account? (Unambiguous)
 			if (result.code == rai::process_result::progress)
 			{
+				std::cerr << "ledger_processor::state_block4 "<< std::endl;
 				rai::account_info info;
 				result.amount = block_a.hashables.balance;
 				auto is_send (false);
 				auto account_error (ledger.store.account_get (transaction, block_a.hashables.account, info));
 				if (!account_error)
 				{
+					std::cerr << "ledger_processor::state_block5 "<< std::endl;
 					// Account already exists
 					result.code = block_a.hashables.previous.is_zero () ? rai::process_result::fork : rai::process_result::progress; // Has this account already been opened? (Ambigious)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::state_block6 "<< std::endl;
 						result.code = ledger.store.block_exists (transaction, block_a.hashables.previous) ? rai::process_result::progress : rai::process_result::gap_previous; // Does the previous block exist in the ledger? (Unambigious)
 						if (result.code == rai::process_result::progress)
 						{
+							std::cerr << "ledger_processor::state_block7 "<< std::endl;
 							is_send = block_a.hashables.balance < info.balance;
 							result.amount = is_send ? (info.balance.number () - result.amount.number ()) : (result.amount.number () - info.balance.number ());
 							result.code = block_a.hashables.previous == info.head ? rai::process_result::progress : rai::process_result::fork; // Is the previous block the account's head block? (Ambigious)
@@ -214,34 +221,42 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 				}
 				else
 				{
+					std::cerr << "ledger_processor::state_block8 "<< std::endl;
 					// Account does not yet exists
 					result.code = block_a.previous ().is_zero () ? rai::process_result::progress : rai::process_result::gap_previous; // Does the first block in an account yield 0 for previous() ? (Unambigious)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::state_block9 "<< std::endl;
 						ledger.stats.inc (rai::stat::type::ledger, rai::stat::detail::open);
 						result.code = !block_a.hashables.link.is_zero () ? rai::process_result::progress : rai::process_result::gap_source; // Is the first block receiving from a send ? (Unambigious)
 					}
 				}
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::state_block10 "<< std::endl;
 					if (!is_send)
 					{
+						std::cerr << "ledger_processor::state_block11 "<< std::endl;
 						if (!block_a.hashables.link.is_zero ())
 						{
+							std::cerr << "ledger_processor::state_block12 "<< std::endl;
 							result.code = ledger.store.block_exists (transaction, block_a.hashables.link) ? rai::process_result::progress : rai::process_result::gap_source; // Have we seen the source block already? (Harmless)
 							if (result.code == rai::process_result::progress)
 							{
+								std::cerr << "ledger_processor::state_block13 "<< std::endl;
 								rai::pending_key key (block_a.hashables.account, block_a.hashables.link);
 								rai::pending_info pending;
 								result.code = ledger.store.pending_get (transaction, key, pending) ? rai::process_result::unreceivable : rai::process_result::progress; // Has this source already been received (Malformed)
 								if (result.code == rai::process_result::progress)
 								{
+									std::cerr << "ledger_processor::state_block14 "<< std::endl;
 									result.code = result.amount == pending.amount ? rai::process_result::progress : rai::process_result::balance_mismatch;
 								}
 							}
 						}
 						else
 						{
+							std::cerr << "ledger_processor::state_block15 "<< std::endl;
 							// If there's no link, the balance must remain the same, only the representative can change
 							result.code = result.amount.is_zero () ? rai::process_result::progress : rai::process_result::balance_mismatch;
 						}
@@ -249,12 +264,14 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 				}
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::state_block16 "<< std::endl;
 					ledger.stats.inc (rai::stat::type::ledger, rai::stat::detail::state_block);
 					result.state_is_send = is_send;
 					ledger.store.block_put (transaction, hash, block_a);
 
 					if (!info.rep_block.is_zero ())
 					{
+						std::cerr << "ledger_processor::state_block17 "<< std::endl;
 						// Move existing representation
 						ledger.store.representation_add (transaction, info.rep_block, 0 - info.balance.number ());
 					}
@@ -263,6 +280,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 
 					if (is_send)
 					{
+						std::cerr << "ledger_processor::state_block18 "<< std::endl;
 						rai::pending_key key (block_a.hashables.link, hash);
 						rai::pending_info info (block_a.hashables.account, result.amount.number ());
 						ledger.store.pending_put (transaction, key, info);
@@ -270,13 +288,16 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					}
 					else if (!block_a.hashables.link.is_zero ())
 					{
+						std::cerr << "ledger_processor::state_block19 "<< std::endl;
 						ledger.store.pending_del (transaction, rai::pending_key (block_a.hashables.account, block_a.hashables.link));
 						ledger.stats.inc (rai::stat::type::ledger, rai::stat::detail::receive);
 					}
+						std::cerr << "ledger_processor::state_block20 "<< std::endl;
 
 					ledger.change_latest (transaction, block_a.hashables.account, hash, hash, block_a.hashables.balance, info.block_count + 1, true);
 					if (!ledger.store.frontier_get (transaction, info.head).is_zero ())
 					{
+						std::cerr << "ledger_processor::state_block21 "<< std::endl;
 						ledger.store.frontier_del (transaction, info.head);
 					}
 					// Frontier table is unnecessary for state blocks and this also prevents old blocks from being inserted on top of state blocks
@@ -289,22 +310,27 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 
 void ledger_processor::change_block (rai::change_block const & block_a)
 {
+	std::cerr << "ledger_processor::change_block1"<< std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block before? (Harmless)
 	if (result.code == rai::process_result::progress)
 	{
+		std::cerr << "ledger_processor::change_block2"<< std::endl;
 		auto previous (ledger.store.block_get (transaction, block_a.hashables.previous));
 		result.code = previous != nullptr ? rai::process_result::progress : rai::process_result::gap_previous; // Have we seen the previous block already? (Harmless)
 		if (result.code == rai::process_result::progress)
 		{
+			std::cerr << "ledger_processor::change_block3"<< std::endl;
 			result.code = block_a.valid_predecessor (*previous) ? rai::process_result::progress : rai::process_result::block_position;
 			if (result.code == rai::process_result::progress)
 			{
+				std::cerr << "ledger_processor::change_block4"<< std::endl;
 				auto account (ledger.store.frontier_get (transaction, block_a.hashables.previous));
 				result.code = account.is_zero () ? rai::process_result::fork : rai::process_result::progress;
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::change_block5"<< std::endl;
 					rai::account_info info;
 					auto latest_error (ledger.store.account_get (transaction, account, info));
 					assert (!latest_error);
@@ -312,6 +338,7 @@ void ledger_processor::change_block (rai::change_block const & block_a)
 					result.code = validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Malformed)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::change_block6"<< std::endl;
 						ledger.store.block_put (transaction, hash, block_a);
 						auto balance (ledger.balance (transaction, block_a.hashables.previous));
 						ledger.store.representation_add (transaction, hash, balance);
@@ -331,25 +358,31 @@ void ledger_processor::change_block (rai::change_block const & block_a)
 
 void ledger_processor::send_block (rai::send_block const & block_a)
 {
+	std::cerr << "ledger_processor::send_block1 "<< std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block before? (Harmless)
 	if (result.code == rai::process_result::progress)
 	{
+		std::cerr << "ledger_processor::send_block2"<< std::endl;
 		auto previous (ledger.store.block_get (transaction, block_a.hashables.previous));
 		result.code = previous != nullptr ? rai::process_result::progress : rai::process_result::gap_previous; // Have we seen the previous block already? (Harmless)
 		if (result.code == rai::process_result::progress)
 		{
+			std::cerr << "ledger_processor::send_block3"<< std::endl;
 			result.code = block_a.valid_predecessor (*previous) ? rai::process_result::progress : rai::process_result::block_position;
 			if (result.code == rai::process_result::progress)
 			{
+				std::cerr << "ledger_processor::send_block4"<< std::endl;
 				auto account (ledger.store.frontier_get (transaction, block_a.hashables.previous));
 				result.code = account.is_zero () ? rai::process_result::fork : rai::process_result::progress;
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::send_block5"<< std::endl;
 					result.code = validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Malformed)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::send_block6"<< std::endl;
 						rai::account_info info;
 						auto latest_error (ledger.store.account_get (transaction, account, info));
 						assert (!latest_error);
@@ -357,6 +390,7 @@ void ledger_processor::send_block (rai::send_block const & block_a)
 						result.code = info.balance.number () >= block_a.hashables.balance.number () ? rai::process_result::progress : rai::process_result::negative_spend; // Is this trying to spend a negative amount (Malicious)
 						if (result.code == rai::process_result::progress)
 						{
+							std::cerr << "ledger_processor::send_block7"<< std::endl;
 							auto amount (info.balance.number () - block_a.hashables.balance.number ());
 							ledger.store.representation_add (transaction, info.rep_block, 0 - amount);
 							ledger.store.block_put (transaction, hash, block_a);
@@ -378,38 +412,47 @@ void ledger_processor::send_block (rai::send_block const & block_a)
 
 void ledger_processor::receive_block (rai::receive_block const & block_a)
 {
+	std::cerr << "ledger_processor::receive_block1 "<< std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block already?  (Harmless)
 	if (result.code == rai::process_result::progress)
 	{
+		std::cerr << "ledger_processor::receive_block2 "<< std::endl;
 		auto previous (ledger.store.block_get (transaction, block_a.hashables.previous));
 		result.code = previous != nullptr ? rai::process_result::progress : rai::process_result::gap_previous;
 		if (result.code == rai::process_result::progress)
 		{
+			std::cerr << "ledger_processor::receive_block3 "<< std::endl;
 			result.code = block_a.valid_predecessor (*previous) ? rai::process_result::progress : rai::process_result::block_position;
 			if (result.code == rai::process_result::progress)
 			{
+				std::cerr << "ledger_processor::receive_block4 "<< std::endl;
 				result.code = ledger.store.block_exists (transaction, block_a.hashables.source) ? rai::process_result::progress : rai::process_result::gap_source; // Have we seen the source block already? (Harmless)
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::receive_block5 "<< std::endl;
 					auto account (ledger.store.frontier_get (transaction, block_a.hashables.previous));
 					result.code = account.is_zero () ? rai::process_result::gap_previous : rai::process_result::progress; //Have we seen the previous block? No entries for account at all (Harmless)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::receive_block6 "<< std::endl;
 						result.code = rai::validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is the signature valid (Malformed)
 						if (result.code == rai::process_result::progress)
 						{
+							std::cerr << "ledger_processor::receive_block7 "<< std::endl;
 							rai::account_info info;
 							ledger.store.account_get (transaction, account, info);
 							result.code = info.head == block_a.hashables.previous ? rai::process_result::progress : rai::process_result::gap_previous; // Block doesn't immediately follow latest block (Harmless)
 							if (result.code == rai::process_result::progress)
 							{
+								std::cerr << "ledger_processor::receive_block8 "<< std::endl;
 								rai::pending_key key (account, block_a.hashables.source);
 								rai::pending_info pending;
 								result.code = ledger.store.pending_get (transaction, key, pending) ? rai::process_result::unreceivable : rai::process_result::progress; // Has this source already been received (Malformed)
 								if (result.code == rai::process_result::progress)
 								{
+									std::cerr << "ledger_processor::receive_block9 "<< std::endl;
 									auto new_balance (info.balance.number () + pending.amount.number ());
 									rai::account_info source_info;
 									auto error (ledger.store.account_get (transaction, pending.source, source_info));
@@ -439,30 +482,37 @@ void ledger_processor::receive_block (rai::receive_block const & block_a)
 
 void ledger_processor::open_block (rai::open_block const & block_a)
 {
+	std::cerr << "ledger_processor::open_block1" << std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block already? (Harmless)
 	if (result.code == rai::process_result::progress)
 	{
+ 		std::cerr << "ledger_processor::open_block2" << std::endl;
 		auto source_missing (!ledger.store.block_exists (transaction, block_a.hashables.source));
 		result.code = source_missing ? rai::process_result::gap_source : rai::process_result::progress; // Have we seen the source block? (Harmless)
 		if (result.code == rai::process_result::progress)
 		{
+			std::cerr << "ledger_processor::open_block3" << std::endl;
 			result.code = rai::validate_message (block_a.hashables.account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is the signature valid (Malformed)
 			if (result.code == rai::process_result::progress)
 			{
+				std::cerr << "ledger_processor::open_block4" << std::endl;
 				rai::account_info info;
 				result.code = ledger.store.account_get (transaction, block_a.hashables.account, info) ? rai::process_result::progress : rai::process_result::fork; // Has this account already been opened? (Malicious)
 				if (result.code == rai::process_result::progress)
 				{
+					std::cerr << "ledger_processor::open_block5" << std::endl;
 					rai::pending_key key (block_a.hashables.account, block_a.hashables.source);
 					rai::pending_info pending;
 					result.code = ledger.store.pending_get (transaction, key, pending) ? rai::process_result::unreceivable : rai::process_result::progress; // Has this source already been received (Malformed)
 					if (result.code == rai::process_result::progress)
 					{
+						std::cerr << "ledger_processor::open_block6" << std::endl;
 						result.code = block_a.hashables.account == rai::burn_account ? rai::process_result::opened_burn_account : rai::process_result::progress; // Is it burning 0 account? (Malicious)
 						if (result.code == rai::process_result::progress)
 						{
+							std::cerr << "ledger_processor::open_block7" << std::endl;
 							rai::account_info source_info;
 							auto error (ledger.store.account_get (transaction, pending.source, source_info));
 							assert (!error);
@@ -835,9 +885,11 @@ void rai::ledger::change_latest (MDB_txn * transaction_a, rai::account const & a
 
 std::unique_ptr<rai::block> rai::ledger::successor (MDB_txn * transaction_a, rai::uint256_union const & root_a)
 {
+	std::cerr << "rai::ledger::successor1\n"
 	rai::block_hash successor (0);
 	if (store.account_exists (transaction_a, root_a))
 	{
+		std::cerr << "rai::ledger::successor2\n"
 		rai::account_info info;
 		auto error (store.account_get (transaction_a, root_a, info));
 		assert (!error);
@@ -845,11 +897,13 @@ std::unique_ptr<rai::block> rai::ledger::successor (MDB_txn * transaction_a, rai
 	}
 	else
 	{
+		std::cerr << "rai::ledger::successor3\n"
 		successor = store.block_successor (transaction_a, root_a);
 	}
 	std::unique_ptr<rai::block> result;
 	if (!successor.is_zero ())
 	{
+		std::cerr << "rai::ledger::successor4\n"
 		result = store.block_get (transaction_a, successor);
 	}
 	assert (successor.is_zero () || result != nullptr);
