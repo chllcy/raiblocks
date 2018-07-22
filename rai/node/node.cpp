@@ -1205,6 +1205,7 @@ node (node_a)
 
 rai::vote_code rai::vote_processor::vote (std::shared_ptr<rai::vote> vote_a, rai::endpoint endpoint_a)
 {
+	BOOST_LOG (node.log) << "vote1";
 	auto result (rai::vote_code::invalid);
 	if (!vote_a->validate ())
 	{
@@ -1218,6 +1219,7 @@ rai::vote_code rai::vote_processor::vote (std::shared_ptr<rai::vote> vote_a, rai
 		{
 			result = rai::vote_code::vote;
 		}
+		BOOST_LOG (node.log) << "vote2:" << result;
 		switch (result)
 		{
 			case rai::vote_code::vote:
@@ -3363,10 +3365,12 @@ confirmed (false)
 
 void rai::election::compute_rep_votes (MDB_txn * transaction_a)
 {
+	BOOST_LOG (node.log) << "compute_rep_votes: ";
 	if (node.config.enable_voting)
 	{
 		node.wallets.foreach_representative (transaction_a, [this, transaction_a](rai::public_key const & pub_a, rai::raw_key const & prv_a) {
 			auto vote (this->node.store.vote_generate (transaction_a, pub_a, prv_a, status.winner));
+			BOOST_LOG (node.log) << "compute_rep_votes2:" << vote.to_json();
 			this->node.vote_processor.vote (vote, this->node.network.endpoint ());
 		});
 	}
@@ -3374,6 +3378,7 @@ void rai::election::compute_rep_votes (MDB_txn * transaction_a)
 
 void rai::election::broadcast_winner ()
 {
+	BOOST_LOG (node.log) << "broadcast_winner: ";
 	rai::transaction transaction (node.store.environment, nullptr, false);
 	compute_rep_votes (transaction);
 	node.network.republish_block (transaction, status.winner);

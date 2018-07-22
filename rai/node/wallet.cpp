@@ -1345,16 +1345,21 @@ void rai::wallets::queue_wallet_action (rai::uint128_t const & amount_a, std::fu
 
 void rai::wallets::foreach_representative (MDB_txn * transaction_a, std::function<void(rai::public_key const & pub_a, rai::raw_key const & prv_a)> const & action_a)
 {
+	BOOST_LOG (node.log) << "foreach_representative1: ";
 	for (auto i (items.begin ()), n (items.end ()); i != n; ++i)
 	{
 		auto & wallet (*i->second);
+		BOOST_LOG (node.log) << "foreach_representative2: ";
 		for (auto j (wallet.store.begin (transaction_a)), m (wallet.store.end ()); j != m; ++j)
 		{
 			rai::account account (j->first.uint256 ());
+			BOOST_LOG (node.log) << "foreach_representative3 ";
 			if (!node.ledger.weight (transaction_a, account).is_zero ())
 			{
+				BOOST_LOG (node.log) << "foreach_representative4 ";
 				if (wallet.store.valid_password (transaction_a))
 				{
+					BOOST_LOG (node.log) << "foreach_representative5 ";
 					rai::raw_key prv;
 					auto error (wallet.store.fetch (transaction_a, j->first.uint256 (), prv));
 					assert (!error);
@@ -1362,6 +1367,7 @@ void rai::wallets::foreach_representative (MDB_txn * transaction_a, std::functio
 				}
 				else
 				{
+					BOOST_LOG (node.log) << "foreach_representative6 ";
 					static auto last_log = std::chrono::steady_clock::time_point ();
 					if (last_log < std::chrono::steady_clock::now () - std::chrono::seconds (60))
 					{
