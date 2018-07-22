@@ -115,10 +115,12 @@ id (block_a->root ())
 
 rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 {
+	 BOOST_LOG (node.log) << "rai::votes::vote:" ;
 	rai::tally_result result;
 	auto existing (rep_votes.find (vote_a->account));
 	if (existing == rep_votes.end ())
 	{
+		BOOST_LOG (node.log) << "rai::votes::vote1" ;
 		// Vote on this block hasn't been seen from rep before
 		result = rai::tally_result::vote;
 		rep_votes.insert (std::make_pair (vote_a->account, vote_a->block));
@@ -127,12 +129,14 @@ rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 	{
 		if (!(*existing->second == *vote_a->block))
 		{
+			BOOST_LOG (node.log) << "rai::votes::vote2";
 			// Rep changed their vote
 			result = rai::tally_result::changed;
 			existing->second = vote_a->block;
 		}
 		else
 		{
+			 BOOST_LOG (node.log) << "rai::votes::vote3";
 			// Rep vote remained the same
 			result = rai::tally_result::confirm;
 		}

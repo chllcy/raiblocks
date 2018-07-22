@@ -248,6 +248,7 @@ void rai::network::republish_block (MDB_txn * transaction, std::shared_ptr<rai::
 // These rules are implemented by the caller, not this function.
 void rai::network::republish_vote (std::shared_ptr<rai::vote> vote_a)
 {
+	BOOST_LOG (node.log) << "republish_vote:" ;
 	rai::confirm_ack confirm (vote_a);
 	std::shared_ptr<std::vector<uint8_t>> bytes (new std::vector<uint8_t>);
 	{
@@ -255,6 +256,7 @@ void rai::network::republish_vote (std::shared_ptr<rai::vote> vote_a)
 		confirm.serialize (stream);
 	}
 	auto list (node.peers.list_fanout ());
+	BOOST_LOG (node.log) << "republish_vote2:" << list.size();
 	for (auto j (list.begin ()), m (list.end ()); j != m; ++j)
 	{
 		node.network.confirm_send (confirm, bytes, *j);
@@ -1215,6 +1217,7 @@ rai::vote_code rai::vote_processor::vote (std::shared_ptr<rai::vote> vote_a, rai
 			rai::transaction transaction (node.store.environment, nullptr, false);
 			max_vote = node.store.vote_max (transaction, vote_a);
 		}
+		BOOST_LOG (node.log) << "vote1.1:" << max_vote->sequence << "," << vote_a->sequence;
 		if (!node.active.vote (vote_a) || max_vote->sequence > vote_a->sequence)
 		{
 			result = rai::vote_code::vote;
@@ -2721,10 +2724,12 @@ public:
 
 void rai::node::process_confirmed (std::shared_ptr<rai::block> block_a)
 {
+	BOOST_LOG (node.log) << "rai::node::process_confirmed";
 	rai::transaction transaction (store.environment, nullptr, false);
 	auto hash (block_a->hash ());
 	if (store.block_exists (transaction, hash))
 	{
+		BOOST_LOG (node.log) << "rai::node::process_confirmed2";
 		confirmed_visitor visitor (transaction, *this, block_a, hash);
 		block_a->visit (visitor);
 		auto account (ledger.account (transaction, hash));
@@ -2733,20 +2738,24 @@ void rai::node::process_confirmed (std::shared_ptr<rai::block> block_a)
 		rai::account pending_account (0);
 		if (auto state = dynamic_cast<rai::state_block *> (block_a.get ()))
 		{
+			BOOST_LOG (node.log) << "rai::node::process_confirmed3";
 			rai::transaction transaction (store.environment, nullptr, false);
 			is_state_send = ledger.is_send (transaction, *state);
 			pending_account = state->hashables.link;
 		}
 		if (auto send = dynamic_cast<rai::send_block *> (block_a.get ()))
 		{
+			BOOST_LOG (node.log) << "rai::node::process_confirmed4";
 			pending_account = send->hashables.destination;
 		}
 		observers.blocks (block_a, account, amount, is_state_send);
 		if (amount > 0)
 		{
+			BOOST_LOG (node.log) << "rai::node::process_confirmed5";
 			observers.account_balance (account, false);
 			if (!pending_account.is_zero ())
 			{
+				BOOST_LOG (node.log) << "rai::node::process_confirmed6";
 				observers.account_balance (pending_account, true);
 			}
 		}
@@ -3388,8 +3397,10 @@ void rai::election::broadcast_winner ()
 
 void rai::election::confirm_once (MDB_txn * transaction_a)
 {
+	BOOST_LOG (node.log) << "confirm_once1 ";
 	if (!confirmed.exchange (true))
 	{
+		BOOST_LOG (node.log) << "confirm_once2";
 		auto winner_l (status.winner);
 		auto node_l (node.shared ());
 		auto confirmation_action_l (confirmation_action);
@@ -3413,6 +3424,7 @@ bool rai::election::have_quorum (rai::tally_t const & tally_a)
 
 void rai::election::confirm_if_quorum (MDB_txn * transaction_a)
 {
+	BOOST_LOG (node.log) << "rai::election::confirm_if_quorum";
 	auto tally_l (node.ledger.tally (transaction_a, votes));
 	assert (tally_l.size () > 0);
 	auto winner (tally_l.begin ());
@@ -3423,14 +3435,18 @@ void rai::election::confirm_if_quorum (MDB_txn * transaction_a)
 	{
 		sum += i.first;
 	}
+	BOOST_LOG (node.log) << "rai::election::confirm_if_quorum2:" << sum ;
 	if (sum >= node.config.online_weight_minimum.number () && !(*block_l == *status.winner))
 	{
+		BOOST_LOG (node.log) << "rai::election::confirm_if_quorum3" ;
 		auto node_l (node.shared ());
 		node_l->block_processor.force (block_l);
 		status.winner = block_l;
 	}
+	BOOST_LOG (node.log) << "rai::election::confirm_if_quorum4";
 	if (have_quorum (tally_l))
 	{
+		BOOST_LOG (node.log) << "rai::election::confirm_if_quorum5";
 		if (node.config.logging.vote_logging () || !votes.uncontested ())
 		{
 			BOOST_LOG (node.log) << boost::str (boost::format ("Vote tally for root %1%") % status.winner->root ().to_string ());
@@ -3449,12 +3465,14 @@ void rai::election::confirm_if_quorum (MDB_txn * transaction_a)
 
 bool rai::election::vote (std::shared_ptr<rai::vote> vote_a)
 {
+	BOOST_LOG (node.log) << "rai::election::vote";
 	assert (!vote_a->validate ());
 	// see republish_vote documentation for an explanation of these rules
 	rai::transaction transaction (node.store.environment, nullptr, false);
 	auto replay (false);
 	auto supply (node.online_reps.online_stake ());
 	auto weight (node.ledger.weight (transaction, vote_a->account));
+	BOOST_LOG (node.log) << "rai::election::vote2:" << supply << "," << weight;
 	if (rai::rai_network == rai::rai_networks::rai_test_network || weight > supply / 1000) // 0.1% or above
 	{
 		unsigned int cooldown;
@@ -3491,6 +3509,7 @@ bool rai::election::vote (std::shared_ptr<rai::vote> vote_a)
 				replay = true;
 			}
 		}
+		BOOST_LOG (node.log) << "rai::election::vote3:" << should_process;
 		if (should_process)
 		{
 			last_votes[vote_a->account] = { std::chrono::steady_clock::now (), vote_a->sequence, vote_a->block->hash () };
@@ -3630,6 +3649,7 @@ bool rai::active_transactions::start (std::pair<std::shared_ptr<rai::block>, std
 // Validate a vote and apply it to the current election if one exists
 bool rai::active_transactions::vote (std::shared_ptr<rai::vote> vote_a)
 {
+	BOOST_LOG (node.log) << "rai::active_transactions::vote1";
 	std::shared_ptr<rai::election> election;
 	{
 		std::lock_guard<std::mutex> lock (mutex);
@@ -3643,8 +3663,10 @@ bool rai::active_transactions::vote (std::shared_ptr<rai::vote> vote_a)
 	auto result (false);
 	if (election)
 	{
+		BOOST_LOG (node.log) << "rai::active_transactions::vote2";
 		result = election->vote (vote_a);
 	}
+	BOOST_LOG (node.log) << "rai::active_transactions::vote3" << result;
 	return result;
 }
 
