@@ -3505,9 +3505,11 @@ void rai::active_transactions::announce_votes ()
 
 	for (auto i (roots.begin ()), n (roots.end ()); i != n; ++i)
 	{
+		BOOST_LOG (node.log) << "announce_votes1: " << election_l->confirmed << "," << i->announcements;
 		auto election_l (i->election);
 		if (!node.store.root_exists (transaction, election_l->votes.id) || (election_l->confirmed && i->announcements >= announcement_min - 1))
 		{
+			BOOST_LOG (node.log) << "announce_votes2: " << confirmed.size () << "," << election_history_size;
 			if (election_l->confirmed)
 			{
 				confirmed.push_back (i->election->status);
@@ -3520,6 +3522,7 @@ void rai::active_transactions::announce_votes ()
 		}
 		else
 		{
+			BOOST_LOG (node.log) << "announce_votes3: " << unconfirmed_count << "," << announcement_long;
 			if (i->announcements > announcement_long)
 			{
 				++unconfirmed_count;
@@ -3528,20 +3531,24 @@ void rai::active_transactions::announce_votes ()
 			node.background ([election_l]() { election_l->broadcast_winner (); });
 			if (i->announcements % announcement_min == 2)
 			{
+				BOOST_LOG (node.log) << "announce_votes4: ";
 				auto reps (std::make_shared<std::vector<rai::peer_information>> (node.peers.representatives (std::numeric_limits<size_t>::max ())));
 
 				for (auto j (reps->begin ()), m (reps->end ()); j != m;)
 				{
+					BOOST_LOG (node.log) << "announce_votes5: ";
 					auto & rep_votes (i->election->votes.rep_votes);
 					auto rep_acct (j->probable_rep_account);
 					if (rep_votes.find (rep_acct) != rep_votes.end ())
 					{
+						BOOST_LOG (node.log) << "announce_votes6: ";
 						std::swap (*j, reps->back ());
 						reps->pop_back ();
 						m = reps->end ();
 					}
 					else
 					{
+						BOOST_LOG (node.log) << "announce_votes7: ";
 						++j;
 						if (node.config.logging.vote_logging ())
 						{
@@ -3551,21 +3558,25 @@ void rai::active_transactions::announce_votes ()
 				}
 				if (!reps->empty ())
 				{
+					BOOST_LOG (node.log) << "announce_votes8: ";
 					// broadcast_confirm_req_base modifies reps, so we clone it once to avoid aliasing
 					node.network.broadcast_confirm_req_base (i->confirm_req_options.first, std::make_shared<std::vector<rai::peer_information>> (*reps), 0);
 					if (i->confirm_req_options.second)
 					{
+						BOOST_LOG (node.log) << "announce_votes9: ";
 						node.network.broadcast_confirm_req_base (i->confirm_req_options.second, reps, 0);
 					}
 				}
 			}
 		}
+		BOOST_LOG (node.log) << "announce_votes10: " ;
 		roots.modify (i, [](rai::conflict_info & info_a) {
 			++info_a.announcements;
 		});
 	}
 	for (auto i (inactive.begin ()), n (inactive.end ()); i != n; ++i)
 	{
+		BOOST_LOG (node.log) << "announce_votes11: " ;
 		assert (roots.find (*i) != roots.end ());
 		roots.erase (*i);
 	}
