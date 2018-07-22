@@ -2724,12 +2724,12 @@ public:
 
 void rai::node::process_confirmed (std::shared_ptr<rai::block> block_a)
 {
-	BOOST_LOG (node.log) << "rai::node::process_confirmed";
+	BOOST_LOG (log) << "rai::node::process_confirmed";
 	rai::transaction transaction (store.environment, nullptr, false);
 	auto hash (block_a->hash ());
 	if (store.block_exists (transaction, hash))
 	{
-		BOOST_LOG (node.log) << "rai::node::process_confirmed2";
+		BOOST_LOG ( log) << "rai::node::process_confirmed2";
 		confirmed_visitor visitor (transaction, *this, block_a, hash);
 		block_a->visit (visitor);
 		auto account (ledger.account (transaction, hash));
@@ -2738,24 +2738,24 @@ void rai::node::process_confirmed (std::shared_ptr<rai::block> block_a)
 		rai::account pending_account (0);
 		if (auto state = dynamic_cast<rai::state_block *> (block_a.get ()))
 		{
-			BOOST_LOG (node.log) << "rai::node::process_confirmed3";
+			BOOST_LOG ( log) << "rai::node::process_confirmed3";
 			rai::transaction transaction (store.environment, nullptr, false);
 			is_state_send = ledger.is_send (transaction, *state);
 			pending_account = state->hashables.link;
 		}
 		if (auto send = dynamic_cast<rai::send_block *> (block_a.get ()))
 		{
-			BOOST_LOG (node.log) << "rai::node::process_confirmed4";
+			BOOST_LOG ( log) << "rai::node::process_confirmed4";
 			pending_account = send->hashables.destination;
 		}
 		observers.blocks (block_a, account, amount, is_state_send);
 		if (amount > 0)
 		{
-			BOOST_LOG (node.log) << "rai::node::process_confirmed5";
+			BOOST_LOG ( log) << "rai::node::process_confirmed5";
 			observers.account_balance (account, false);
 			if (!pending_account.is_zero ())
 			{
-				BOOST_LOG (node.log) << "rai::node::process_confirmed6";
+				BOOST_LOG ( log) << "rai::node::process_confirmed6";
 				observers.account_balance (pending_account, true);
 			}
 		}
