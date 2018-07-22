@@ -1813,6 +1813,7 @@ void rai::node::send_keepalive (rai::endpoint const & endpoint_a)
 
 void rai::node::process_fork (MDB_txn * transaction_a, std::shared_ptr<rai::block> block_a)
 {
+	BOOST_LOG (log) << "rai::node::process_fork";
 	auto root (block_a->root ());
 	if (!store.block_exists (transaction_a, block_a->hash ()) && store.root_exists (transaction_a, block_a->root ()))
 	{
