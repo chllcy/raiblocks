@@ -324,6 +324,7 @@ void rai::network::send_confirm_req (rai::endpoint const & endpoint_a, std::shar
 template <typename T>
 void rep_query (rai::node & node_a, T const & peers_a)
 {
+	BOOST_LOG (node_a.log) << "rep_query:" << peers_a.size();
 	rai::transaction transaction (node_a.store.environment, nullptr, false);
 	std::shared_ptr<rai::block> block (node_a.store.block_random (transaction));
 	auto hash (block->hash ());
