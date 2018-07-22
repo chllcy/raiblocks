@@ -3538,7 +3538,7 @@ void rai::active_transactions::announce_votes ()
 	{
 		BOOST_LOG (node.log) << "announce_votes1: " << i->election->confirmed << "," << i->announcements;
 		auto election_l (i->election);
-		if (!node.store.root_exists (transaction, election_l->votes.id) || (election_l->confirmed && i->announcements >= announcement_min - 1))
+		if (!node.store.root_exists (transaction, election_l->votes.id) || (election_l->confirmed))// && i->announcements >= announcement_min - 1
 		{
 			BOOST_LOG (node.log) << "announce_votes2: " << confirmed.size () << "," << election_history_size;
 			if (election_l->confirmed)
