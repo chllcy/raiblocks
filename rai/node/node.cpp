@@ -1219,12 +1219,14 @@ rai::vote_code rai::vote_processor::vote (std::shared_ptr<rai::vote> vote_a, rai
 		{
 			result = rai::vote_code::vote;
 		}
-		BOOST_LOG (node.log) << "vote2:" << result;
+		BOOST_LOG (node.log) << "vote2:" ;
 		switch (result)
 		{
 			case rai::vote_code::vote:
+				BOOST_LOG (node.log) << "vote2.1";
 				node.observers.vote (vote_a, endpoint_a);
 			case rai::vote_code::replay:
+				BOOST_LOG (node.log) << "vote2.2:" << max_vote->sequence << "," << vote_a->sequence;
 				// This tries to assist rep nodes that have lost track of their highest sequence number by replaying our highest known vote back to them
 				// Only do this if the sequence number is significantly different to account for network reordering
 				// Amplify attack considerations: We're sending out a confirm_ack in response to a confirm_ack for no net traffic increase
@@ -3370,7 +3372,7 @@ void rai::election::compute_rep_votes (MDB_txn * transaction_a)
 	{
 		node.wallets.foreach_representative (transaction_a, [this, transaction_a](rai::public_key const & pub_a, rai::raw_key const & prv_a) {
 			auto vote (this->node.store.vote_generate (transaction_a, pub_a, prv_a, status.winner));
-			BOOST_LOG (node.log) << "compute_rep_votes2:" << vote.to_json();
+			BOOST_LOG (node.log) << "compute_rep_votes2:" ;
 			this->node.vote_processor.vote (vote, this->node.network.endpoint ());
 		});
 	}
