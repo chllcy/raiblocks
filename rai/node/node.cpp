@@ -3505,7 +3505,7 @@ void rai::active_transactions::announce_votes ()
 
 	for (auto i (roots.begin ()), n (roots.end ()); i != n; ++i)
 	{
-		BOOST_LOG (node.log) << "announce_votes1: " << i->confirmed << "," << i->announcements;
+		BOOST_LOG (node.log) << "announce_votes1: " << i->election->confirmed << "," << i->announcements;
 		auto election_l (i->election);
 		if (!node.store.root_exists (transaction, election_l->votes.id) || (election_l->confirmed && i->announcements >= announcement_min - 1))
 		{
