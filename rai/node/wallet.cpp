@@ -122,7 +122,6 @@ void rai::wallet_store::deterministic_clear (MDB_txn * transaction_a)
 
 bool rai::wallet_store::valid_password (MDB_txn * transaction_a)
 {
-	/*
 	rai::raw_key zero;
 	zero.data.clear ();
 	rai::raw_key wallet_key_l;
@@ -131,8 +130,6 @@ bool rai::wallet_store::valid_password (MDB_txn * transaction_a)
 	check_l.encrypt (zero, wallet_key_l, salt (transaction_a).owords[0]);
 	bool ok = check (transaction_a) == check_l;
 	return ok;
-	*/
-	return true;
 }
 
 bool rai::wallet_store::attempt_password (MDB_txn * transaction_a, std::string const & password_a)
