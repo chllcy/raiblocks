@@ -896,7 +896,7 @@ lmdb_max_dbs (128)
 	switch (rai::rai_network)
 	{
 		case rai::rai_networks::rai_test_network:
-			preconfigured_peers.push_back ("x7.chenhao888.top");
+			preconfigured_peers.push_back ("aws.chenhao888.top");
 			preconfigured_representatives.push_back (rai::genesis_account);
 			state_block_parse_canary = rai::block_hash ("5005F5283DE8D2DAB0DAC41DE9BD23640F962B4F0EA7D3128C2EA3D78D578E27");
 			state_block_generate_canary = rai::block_hash ("FC18E2265FB835E8CF60E63531053A768CEDF5194263B01A5C95574944E4660D");
