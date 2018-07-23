@@ -36,7 +36,7 @@
         },
         "work_peers": "",
         "preconfigured_peers": [
-            "x7.chenhao888.top"
+            "aws.chenhao888.top"
         ],
         "preconfigured_representatives": [
             "xrb_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo"
@@ -53,8 +53,8 @@
         "callback_port": "0",
         "callback_target": "",
         "lmdb_max_dbs": "128",
-        "state_block_parse_canary": "1F000000000000000A6290000000000048468600000000000600000000000000",
-        "state_block_generate_canary": "29AE8A000000000006000000000000000EC98A00000000000A62900000000000"
+        "state_block_parse_canary": "5005F5283DE8D2DAB0DAC41DE9BD23640F962B4F0EA7D3128C2EA3D78D578E27",
+        "state_block_generate_canary": "FC18E2265FB835E8CF60E63531053A768CEDF5194263B01A5C95574944E4660D"
     },
     "opencl_enable": "false",
     "opencl": {
