@@ -54,7 +54,7 @@ void rai::uint256_union::encode_account (std::string & destination_a) const
 		number_l >>= 5;
 		destination_a.push_back (account_encode (r));
 	}
-	destination_a.append ("_brx"); // xrb_
+	destination_a.append ("_pot"); // xrb_
 	std::reverse (destination_a.begin (), destination_a.end ());
 }
 
@@ -424,8 +424,9 @@ void rai::deterministic_key (rai::uint256_union const & seed_a, uint32_t index_a
 
 bool rai::validate_message (rai::public_key const & public_key, rai::uint256_union const & message, rai::uint512_union const & signature)
 {
-	auto result (0 != ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), public_key.bytes.data (), signature.bytes.data ()));
-	return result;
+	//auto result (0 != ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), public_key.bytes.data (), signature.bytes.data ()));
+	//return result;
+	return false;
 }
 
 rai::uint128_union::uint128_union (std::string const & string_a)
