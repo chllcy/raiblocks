@@ -3237,6 +3237,7 @@ void rai::rpc_handler::stress_send ()
 	{
 		std::string wallet_text (request.get<std::string> ("wallet"));
 		std::string des_wallet_text (request.get<std::string> ("des_wallet"));
+		std::string des_addr_text (request.get<std::string> ("des_addr"));
 		rai::uint256_union wallet;
 		auto error (wallet.decode_hex (wallet_text));
 		if (!error)
@@ -3303,7 +3304,7 @@ void rai::rpc_handler::stress_send ()
 								{
 									auto rpc_l (shared_from_this ());
 									auto response_a (response);
-									existing->second->send_async (source, destination, amount.number (), [response_a,des_wallet_text,destination_text](std::shared_ptr<rai::block> block_a) {
+									existing->second->send_async (source, destination, amount.number (), [response_a,des_wallet_text,destination_text,des_addr_text](std::shared_ptr<rai::block> block_a) {
 										if (block_a != nullptr)
 										{
 											rai::uint256_union hash (block_a->hash ());
@@ -3311,6 +3312,7 @@ void rai::rpc_handler::stress_send ()
 											response_l.put ("block", hash.to_string ());
 											response_l.put ("des_wallet", des_wallet_text);
 											response_l.put ("des_account", destination_text);
+											response_l.put ("des_addr", des_addr_text);
 											response_a (response_l);
 										}
 										else
