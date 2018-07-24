@@ -18,7 +18,7 @@
             "ledger": "false",
             "ledger_duplicate": "false",
             "vote": "false",
-            "network": "true",
+            "network": "false",
             "network_message": "false",
             "network_publish": "false",
             "network_packet": "false",
