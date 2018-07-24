@@ -181,6 +181,7 @@ public:
 	void search_pending ();
 	void search_pending_all ();
 	void send ();
+	void stress_send();
 	void stats ();
 	void stop ();
 	void successors ();

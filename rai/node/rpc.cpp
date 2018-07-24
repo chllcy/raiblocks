@@ -3230,6 +3230,134 @@ void rai::rpc_handler::send ()
 	}
 }
 
+
+void rai::rpc_handler::stress_send ()
+{
+	if (rpc.config.enable_control)
+	{
+		std::string wallet_text (request.get<std::string> ("wallet"));
+		std::string des_wallet_text (request.get<std::string> ("des_wallet"));
+		rai::uint256_union wallet;
+		auto error (wallet.decode_hex (wallet_text));
+		if (!error)
+		{
+			auto existing (node.wallets.items.find (wallet));
+			if (existing != node.wallets.items.end ())
+			{
+				std::string source_text (request.get<std::string> ("source"));
+				rai::account source;
+				auto error (source.decode_account (source_text));
+				if (!error)
+				{
+					std::string destination_text (request.get<std::string> ("destination"));
+					rai::account destination;
+					auto error (destination.decode_account (destination_text));
+					if (!error)
+					{
+						std::string amount_text (request.get<std::string> ("amount"));
+						rai::amount amount;
+						auto error (amount.decode_dec (amount_text));
+						if (!error)
+						{
+							uint64_t work (0);
+							boost::optional<std::string> work_text (request.get_optional<std::string> ("work"));
+							if (work_text.is_initialized ())
+							{
+								error = rai::from_string_hex (work_text.get (), work);
+								if (error)
+								{
+									error_response (response, "Bad work");
+								}
+							}
+							rai::uint128_t balance (0);
+							if (!error)
+							{
+								rai::transaction transaction (node.store.environment, nullptr, work != 0); // false if no "work" in request, true if work > 0
+								rai::account_info info;
+								if (!node.store.account_get (transaction, source, info))
+								{
+									balance = (info.balance).number ();
+								}
+								else
+								{
+									error = true;
+									error_response (response, "Account not found");
+								}
+								if (!error && work)
+								{
+									if (!rai::work_validate (info.head, work))
+									{
+										existing->second->store.work_put (transaction, source, work);
+									}
+									else
+									{
+										error = true;
+										error_response (response, "Invalid work");
+									}
+								}
+							}
+							if (!error)
+							{
+								boost::optional<std::string> send_id (request.get_optional<std::string> ("id"));
+								if (balance >= amount.number ())
+								{
+									auto rpc_l (shared_from_this ());
+									auto response_a (response);
+									existing->second->send_async (source, destination, amount.number (), [response_a,des_wallet_text,destination_text](std::shared_ptr<rai::block> block_a) {
+										if (block_a != nullptr)
+										{
+											rai::uint256_union hash (block_a->hash ());
+											boost::property_tree::ptree response_l;
+											response_l.put ("block", hash.to_string ());
+											response_l.put ("des_wallet", des_wallet_text);
+											response_l.put ("des_account", destination_text);
+											response_a (response_l);
+										}
+										else
+										{
+											error_response (response_a, "Error generating block");
+										}
+									},
+									work == 0, send_id);
+								}
+								else
+								{
+									error_response (response, "Insufficient balance");
+								}
+							}
+						}
+						else
+						{
+							error_response (response, "Bad amount format");
+						}
+					}
+					else
+					{
+						error_response (response, "Bad destination account");
+					}
+				}
+				else
+				{
+					error_response (response, "Bad source account");
+				}
+			}
+			else
+			{
+				error_response (response, "Wallet not found");
+			}
+		}
+		else
+		{
+			error_response (response, "Bad wallet number");
+		}
+	}
+	else
+	{
+		error_response (response, "RPC control is disabled");
+	}
+}
+
+
 void rai::rpc_handler::stats ()
 {
 	bool error = false;
@@ -4880,6 +5008,10 @@ void rai::rpc_handler::process_request ()
 		else if (action == "send")
 		{
 			send ();
+		}
+		else if (action == "stress_send")
+		{
+			stress_send ();
 		}
 		else if (action == "stats")
 		{
