@@ -378,7 +378,7 @@ if (RAIBLOCKS_GUI)
 	set_target_properties (qt qt_system PROPERTIES LINK_FLAGS "${PLATFORM_LINK_FLAGS}")
 endif (RAIBLOCKS_GUI)
 
-add_executable (rai_node
+add_executable (top_node
 	rai/rai_node/daemon.cpp
 	rai/rai_node/daemon.hpp
 	rai/rai_node/entry.cpp)
