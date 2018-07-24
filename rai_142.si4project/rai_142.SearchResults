@@ -1,0 +1,1180 @@
+---- signature Matches (173 in 32 files) ----
+TEST in block.cpp (rai\core_test) : 
+	rai::uint256_union message (0);
+	rai::uint512_union signature;
+	ed25519_sign (message.bytes.data (), sizeof (message.bytes), prv.bytes.data (), pub.bytes.data (), signature.bytes.data ());
+	auto valid1 (ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), pub.bytes.data (), signature.bytes.data ()));
+	ASSERT_EQ (0, valid1);
+	signature.bytes[32] ^= 0x1;
+	auto valid2 (ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), pub.bytes.data (), signature.bytes.data ()));
+	ASSERT_NE (0, valid2);
+}
+
+TEST in block.cpp (rai\core_test) : 
+	rai::uint256_union hash (block.hash ());
+	ASSERT_FALSE (rai::validate_message (key1.pub, hash, block.signature));
+	block.signature.bytes[32] ^= 0x1;
+	ASSERT_TRUE (rai::validate_message (key1.pub, hash, block.signature));
+}
+
+TEST (block, send_serialize)
+TEST in block.cpp (rai\core_test) : 
+	block2.hashables.link.clear ();
+	block2.signature.clear ();
+	block2.work = 0;
+	rai::bufferstream stream2 (bytes.data (), bytes.size ());
+	ASSERT_FALSE (block2.deserialize (stream2));
+TEST in block.cpp (rai\core_test) : 
+	block3.hashables.link.clear ();
+	block3.signature.clear ();
+	block3.work = 0;
+	ASSERT_FALSE (block3.deserialize_json (tree));
+	ASSERT_EQ (block1, block3);
+rai::send_block::serialize in blocks.cpp (rai\lib) : 
+	write (stream_a, hashables.balance.bytes);
+	write (stream_a, signature.bytes);
+	write (stream_a, work);
+}
+
+rai::send_block::serialize_json in blocks.cpp (rai\lib) : 
+	tree.put ("balance", balance);
+	std::string signature_l;
+	signature.encode_hex (signature_l);
+	tree.put ("work", rai::to_string_hex (work));
+	tree.put ("signature", signature_l);
+	std::stringstream ostream;
+	boost::property_tree::write_json (ostream, tree);
+	string_a = ostream.str ();
+rai::send_block::deserialize in blocks.cpp (rai\lib) : 
+			{
+				error = read (stream_a, signature.bytes);
+				if (!error)
+				{
+					error = read (stream_a, work);
+rai::send_block::deserialize_json in blocks.cpp (rai\lib) : 
+		auto work_l (tree_a.get<std::string> ("work"));
+		auto signature_l (tree_a.get<std::string> ("signature"));
+		error = hashables.previous.decode_hex (previous_l);
+		if (!error)
+		{
+rai::send_block::deserialize_json in blocks.cpp (rai\lib) : 
+					{
+						error = signature.decode_hex (signature_l);
+					}
+				}
+			}
+rai::send_block::send_block in blocks.cpp (rai\lib) : 
+hashables (previous_a, destination_a, balance_a),
+signature (rai::sign_message (prv_a, pub_a, hash ())),
+work (work_a)
+{
+}
+rai::send_block::send_block in blocks.cpp (rai\lib) : 
+	{
+		error_a = rai::read (stream_a, signature.bytes);
+		if (!error_a)
+		{
+			error_a = rai::read (stream_a, work);
+rai::send_block::send_block in blocks.cpp (rai\lib) : 
+		{
+			auto signature_l (tree_a.get<std::string> ("signature"));
+			auto work_l (tree_a.get<std::string> ("work"));
+			error_a = signature.decode_hex (signature_l);
+			if (!error_a)
+			{
+				error_a = rai::from_string_hex (work_l, work);
+rai::send_block::operator== in blocks.cpp (rai\lib) : 
+{
+	auto result (hashables.destination == other_a.hashables.destination && hashables.previous == other_a.hashables.previous && hashables.balance == other_a.hashables.balance && work == other_a.work && signature == other_a.signature);
+	return result;
+}
+
+blocks.cpp (rai\lib) line 328 : 
+
+rai::signature rai::send_block::block_signature () const
+{
+	return signature;
+}
+
+void rai::send_block::signature_set (rai::uint512_union const & signature_a)
+{
+	signature = signature_a;
+}
+
+rai::open_hashables::open_hashables (rai::block_hash const & source_a, rai::account const & representative_a, rai::account const & account_a) :
+rai::open_block::open_block in blocks.cpp (rai\lib) : 
+hashables (source_a, representative_a, account_a),
+signature (rai::sign_message (prv_a, pub_a, hash ())),
+work (work_a)
+{
+	assert (!representative_a.is_zero ());
+rai::open_block::open_block in blocks.cpp (rai\lib) : 
+{
+	signature.clear ();
+}
+
+rai::open_block::open_block (bool & error_a, rai::stream & stream_a) :
+rai::open_block::open_block in blocks.cpp (rai\lib) : 
+	{
+		error_a = rai::read (stream_a, signature);
+		if (!error_a)
+		{
+			error_a = rai::read (stream_a, work);
+rai::open_block::open_block in blocks.cpp (rai\lib) : 
+			auto work_l (tree_a.get<std::string> ("work"));
+			auto signature_l (tree_a.get<std::string> ("signature"));
+			error_a = rai::from_string_hex (work_l, work);
+			if (!error_a)
+			{
+				error_a = signature.decode_hex (signature_l);
+			}
+		}
+		catch (std::runtime_error const &)
+rai::open_block::serialize in blocks.cpp (rai\lib) : 
+	write (stream_a, hashables.account);
+	write (stream_a, signature);
+	write (stream_a, work);
+}
+
+rai::open_block::serialize_json in blocks.cpp (rai\lib) : 
+	tree.put ("account", hashables.account.to_account ());
+	std::string signature_l;
+	signature.encode_hex (signature_l);
+	tree.put ("work", rai::to_string_hex (work));
+	tree.put ("signature", signature_l);
+	std::stringstream ostream;
+	boost::property_tree::write_json (ostream, tree);
+	string_a = ostream.str ();
+rai::open_block::deserialize in blocks.cpp (rai\lib) : 
+			{
+				error = read (stream_a, signature);
+				if (!error)
+				{
+					error = read (stream_a, work);
+rai::open_block::deserialize_json in blocks.cpp (rai\lib) : 
+		auto work_l (tree_a.get<std::string> ("work"));
+		auto signature_l (tree_a.get<std::string> ("signature"));
+		error = hashables.source.decode_hex (source_l);
+		if (!error)
+		{
+rai::open_block::deserialize_json in blocks.cpp (rai\lib) : 
+					{
+						error = signature.decode_hex (signature_l);
+					}
+				}
+			}
+rai::open_block::operator== in blocks.cpp (rai\lib) : 
+{
+	return hashables.source == other_a.hashables.source && hashables.representative == other_a.hashables.representative && hashables.account == other_a.hashables.account && work == other_a.work && signature == other_a.signature;
+}
+
+bool rai::open_block::valid_predecessor (rai::block const & block_a) const
+blocks.cpp (rai\lib) line 582 : 
+
+rai::signature rai::open_block::block_signature () const
+{
+	return signature;
+}
+
+void rai::open_block::signature_set (rai::uint512_union const & signature_a)
+{
+	signature = signature_a;
+}
+
+rai::change_hashables::change_hashables (rai::block_hash const & previous_a, rai::account const & representative_a) :
+rai::change_block::change_block in blocks.cpp (rai\lib) : 
+hashables (previous_a, representative_a),
+signature (rai::sign_message (prv_a, pub_a, hash ())),
+work (work_a)
+{
+}
+rai::change_block::change_block in blocks.cpp (rai\lib) : 
+	{
+		error_a = rai::read (stream_a, signature);
+		if (!error_a)
+		{
+			error_a = rai::read (stream_a, work);
+rai::change_block::change_block in blocks.cpp (rai\lib) : 
+			auto work_l (tree_a.get<std::string> ("work"));
+			auto signature_l (tree_a.get<std::string> ("signature"));
+			error_a = rai::from_string_hex (work_l, work);
+			if (!error_a)
+			{
+				error_a = signature.decode_hex (signature_l);
+			}
+		}
+		catch (std::runtime_error const &)
+rai::change_block::serialize in blocks.cpp (rai\lib) : 
+	write (stream_a, hashables.representative);
+	write (stream_a, signature);
+	write (stream_a, work);
+}
+
+rai::change_block::serialize_json in blocks.cpp (rai\lib) : 
+	tree.put ("work", rai::to_string_hex (work));
+	std::string signature_l;
+	signature.encode_hex (signature_l);
+	tree.put ("signature", signature_l);
+	std::stringstream ostream;
+	boost::property_tree::write_json (ostream, tree);
+	string_a = ostream.str ();
+rai::change_block::deserialize in blocks.cpp (rai\lib) : 
+		{
+			error = read (stream_a, signature);
+			if (!error)
+			{
+				error = read (stream_a, work);
+rai::change_block::deserialize_json in blocks.cpp (rai\lib) : 
+		auto work_l (tree_a.get<std::string> ("work"));
+		auto signature_l (tree_a.get<std::string> ("signature"));
+		error = hashables.previous.decode_hex (previous_l);
+		if (!error)
+		{
+rai::change_block::deserialize_json in blocks.cpp (rai\lib) : 
+				{
+					error = signature.decode_hex (signature_l);
+				}
+			}
+		}
+rai::change_block::operator== in blocks.cpp (rai\lib) : 
+{
+	return hashables.previous == other_a.hashables.previous && hashables.representative == other_a.hashables.representative && work == other_a.work && signature == other_a.signature;
+}
+
+bool rai::change_block::valid_predecessor (rai::block const & block_a) const
+blocks.cpp (rai\lib) line 818 : 
+
+rai::signature rai::change_block::block_signature () const
+{
+	return signature;
+}
+
+void rai::change_block::signature_set (rai::uint512_union const & signature_a)
+{
+	signature = signature_a;
+}
+
+rai::state_hashables::state_hashables (rai::account const & account_a, rai::block_hash const & previous_a, rai::account const & representative_a, rai::amount const & balance_a, rai::uint256_union const & link_a) :
+rai::state_block::state_block in blocks.cpp (rai\lib) : 
+hashables (account_a, previous_a, representative_a, balance_a, link_a),
+signature (rai::sign_message (prv_a, pub_a, hash ())),
+work (work_a)
+{
+}
+rai::state_block::state_block in blocks.cpp (rai\lib) : 
+	{
+		error_a = rai::read (stream_a, signature);
+		if (!error_a)
+		{
+			error_a = rai::read (stream_a, work);
+rai::state_block::state_block in blocks.cpp (rai\lib) : 
+			auto type_l (tree_a.get<std::string> ("type"));
+			auto signature_l (tree_a.get<std::string> ("signature"));
+			auto work_l (tree_a.get<std::string> ("work"));
+			error_a = type_l != "state";
+			if (!error_a)
+rai::state_block::state_block in blocks.cpp (rai\lib) : 
+				{
+					error_a = signature.decode_hex (signature_l);
+				}
+			}
+		}
+rai::state_block::serialize in blocks.cpp (rai\lib) : 
+	write (stream_a, hashables.link);
+	write (stream_a, signature);
+	write (stream_a, boost::endian::native_to_big (work));
+}
+
+rai::state_block::serialize_json in blocks.cpp (rai\lib) : 
+	tree.put ("link_as_account", hashables.link.to_account ());
+	std::string signature_l;
+	signature.encode_hex (signature_l);
+	tree.put ("signature", signature_l);
+	tree.put ("work", rai::to_string_hex (work));
+	std::stringstream ostream;
+	boost::property_tree::write_json (ostream, tree);
+rai::state_block::deserialize in blocks.cpp (rai\lib) : 
+					{
+						error = read (stream_a, signature);
+						if (!error)
+						{
+							error = read (stream_a, work);
+rai::state_block::deserialize_json in blocks.cpp (rai\lib) : 
+		auto work_l (tree_a.get<std::string> ("work"));
+		auto signature_l (tree_a.get<std::string> ("signature"));
+		error = hashables.account.decode_account (account_l);
+		if (!error)
+		{
+rai::state_block::deserialize_json in blocks.cpp (rai\lib) : 
+							{
+								error = signature.decode_hex (signature_l);
+							}
+						}
+					}
+blocks.cpp (rai\lib) line 1117 : 
+
+rai::signature rai::state_block::block_signature () const
+{
+	return signature;
+}
+
+void rai::state_block::signature_set (rai::uint512_union const & signature_a)
+{
+	signature = signature_a;
+}
+
+std::unique_ptr<rai::block> rai::deserialize_block_json (boost::property_tree::ptree const & tree_a)
+rai::receive_block::operator== in blocks.cpp (rai\lib) : 
+{
+	auto result (hashables.previous == other_a.hashables.previous && hashables.source == other_a.hashables.source && work == other_a.work && signature == other_a.signature);
+	return result;
+}
+
+rai::receive_block::deserialize in blocks.cpp (rai\lib) : 
+		{
+			error = read (stream_a, signature.bytes);
+			if (!error)
+			{
+				error = read (stream_a, work);
+rai::receive_block::deserialize_json in blocks.cpp (rai\lib) : 
+		auto work_l (tree_a.get<std::string> ("work"));
+		auto signature_l (tree_a.get<std::string> ("signature"));
+		error = hashables.previous.decode_hex (previous_l);
+		if (!error)
+		{
+rai::receive_block::deserialize_json in blocks.cpp (rai\lib) : 
+				{
+					error = signature.decode_hex (signature_l);
+				}
+			}
+		}
+rai::receive_block::serialize in blocks.cpp (rai\lib) : 
+	write (stream_a, hashables.source.bytes);
+	write (stream_a, signature.bytes);
+	write (stream_a, work);
+}
+
+rai::receive_block::serialize_json in blocks.cpp (rai\lib) : 
+	tree.put ("source", source);
+	std::string signature_l;
+	signature.encode_hex (signature_l);
+	tree.put ("work", rai::to_string_hex (work));
+	tree.put ("signature", signature_l);
+	std::stringstream ostream;
+	boost::property_tree::write_json (ostream, tree);
+	string_a = ostream.str ();
+rai::receive_block::receive_block in blocks.cpp (rai\lib) : 
+hashables (previous_a, source_a),
+signature (rai::sign_message (prv_a, pub_a, hash ())),
+work (work_a)
+{
+}
+rai::receive_block::receive_block in blocks.cpp (rai\lib) : 
+	{
+		error_a = rai::read (stream_a, signature);
+		if (!error_a)
+		{
+			error_a = rai::read (stream_a, work);
+rai::receive_block::receive_block in blocks.cpp (rai\lib) : 
+		{
+			auto signature_l (tree_a.get<std::string> ("signature"));
+			auto work_l (tree_a.get<std::string> ("work"));
+			error_a = signature.decode_hex (signature_l);
+			if (!error_a)
+			{
+				error_a = rai::from_string_hex (work_l, work);
+blocks.cpp (rai\lib) line 1447 : 
+
+rai::signature rai::receive_block::block_signature () const
+{
+	return signature;
+}
+
+void rai::receive_block::signature_set (rai::uint512_union const & signature_a)
+{
+	signature = signature_a;
+}
+
+rai::block_type rai::receive_block::type () const
+rai::block in blocks.hpp (rai\lib) : 
+	virtual rai::block_type type () const = 0;
+	virtual rai::signature block_signature () const = 0;
+	virtual void signature_set (rai::uint512_union const &) = 0;
+	virtual ~block () = default;
+	virtual bool valid_predecessor (rai::block const &) const = 0;
+};
+rai::send_block in blocks.hpp (rai\lib) : 
+	rai::block_type type () const override;
+	rai::signature block_signature () const override;
+	void signature_set (rai::uint512_union const &) override;
+	bool operator== (rai::block const &) const override;
+	bool operator== (rai::send_block const &) const;
+	bool valid_predecessor (rai::block const &) const override;
+	static size_t constexpr size = sizeof (rai::account) + sizeof (rai::block_hash) + sizeof (rai::amount) + sizeof (rai::signature) + sizeof (uint64_t);
+	send_hashables hashables;
+	rai::signature signature;
+	uint64_t work;
+};
+class receive_hashables
+rai::receive_block in blocks.hpp (rai\lib) : 
+	rai::block_type type () const override;
+	rai::signature block_signature () const override;
+	void signature_set (rai::uint512_union const &) override;
+	bool operator== (rai::block const &) const override;
+	bool operator== (rai::receive_block const &) const;
+	bool valid_predecessor (rai::block const &) const override;
+	static size_t constexpr size = sizeof (rai::block_hash) + sizeof (rai::block_hash) + sizeof (rai::signature) + sizeof (uint64_t);
+	receive_hashables hashables;
+	rai::signature signature;
+	uint64_t work;
+};
+class open_hashables
+rai::open_block in blocks.hpp (rai\lib) : 
+	rai::block_type type () const override;
+	rai::signature block_signature () const override;
+	void signature_set (rai::uint512_union const &) override;
+	bool operator== (rai::block const &) const override;
+	bool operator== (rai::open_block const &) const;
+	bool valid_predecessor (rai::block const &) const override;
+	static size_t constexpr size = sizeof (rai::block_hash) + sizeof (rai::account) + sizeof (rai::account) + sizeof (rai::signature) + sizeof (uint64_t);
+	rai::open_hashables hashables;
+	rai::signature signature;
+	uint64_t work;
+};
+class change_hashables
+rai::change_block in blocks.hpp (rai\lib) : 
+	rai::block_type type () const override;
+	rai::signature block_signature () const override;
+	void signature_set (rai::uint512_union const &) override;
+	bool operator== (rai::block const &) const override;
+	bool operator== (rai::change_block const &) const;
+	bool valid_predecessor (rai::block const &) const override;
+	static size_t constexpr size = sizeof (rai::block_hash) + sizeof (rai::account) + sizeof (rai::signature) + sizeof (uint64_t);
+	rai::change_hashables hashables;
+	rai::signature signature;
+	uint64_t work;
+};
+class state_hashables
+rai::state_hashables in blocks.hpp (rai\lib) : 
+	// Uses:
+	// Bulk signature validation in advance of further ledger processing
+	// Arranging uncomitted transactions by account
+	rai::account account;
+	// Previous transaction in this chain
+rai::state_block in blocks.hpp (rai\lib) : 
+	rai::block_type type () const override;
+	rai::signature block_signature () const override;
+	void signature_set (rai::uint512_union const &) override;
+	bool operator== (rai::block const &) const override;
+	bool operator== (rai::state_block const &) const;
+	bool valid_predecessor (rai::block const &) const override;
+	static size_t constexpr size = sizeof (rai::account) + sizeof (rai::block_hash) + sizeof (rai::account) + sizeof (rai::amount) + sizeof (rai::uint256_union) + sizeof (rai::signature) + sizeof (uint64_t);
+	rai::state_hashables hashables;
+	rai::signature signature;
+	uint64_t work;
+};
+class block_visitor
+rai::block_store::upgrade_v8_to_v9 in blockstore.cpp (rai) : 
+		auto error (rai::read (stream, sequence));
+		// Create a dummy vote with the same sequence number for easy upgrading.  This won't have a valid signature.
+		auto dummy (std::make_shared<rai::vote> (rai::account (i->first.uint256 ()), junk.prv, sequence, block));
+		std::vector<uint8_t> vector;
+		{
+TEST in block_store.cpp (rai\core_test) : 
+	rai::uint256_union hash1 (block.hash ());
+	block.signature = rai::sign_message (key1.prv, key1.pub, hash1);
+	rai::transaction transaction (store.environment, nullptr, true);
+	auto latest1 (store.block_get (transaction, hash1));
+	ASSERT_EQ (nullptr, latest1);
+TEST in block_store.cpp (rai\core_test) : 
+	rai::uint256_union hash1 (block.hash ());
+	block.signature = rai::sign_message (key1.prv, key1.pub, hash1);
+	rai::transaction transaction (store.environment, nullptr, true);
+	auto latest1 (store.block_get (transaction, hash1));
+	ASSERT_EQ (nullptr, latest1);
+TEST in block_store.cpp (rai\core_test) : 
+	rai::uint256_union hash2 (block2.hash ());
+	block2.signature = rai::sign_message (key1.prv, key1.pub, hash2);
+	auto latest2 (store.block_get (transaction, hash2));
+	ASSERT_EQ (nullptr, latest2);
+	store.block_put (transaction, hash1, block);
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0,
+cl::detail::functionImplementation_ in cl.hpp (CL) : 
+
+	//! \brief Function signature of kernel functor with no event dependency.
+	typedef Event type_(
+		const EnqueueArgs&,
+		T0);
+compatibility::make_kernel in cl2.hpp (CL) : 
+
+        //! \brief Function signature of kernel functor with no event dependency.
+        typedef Event type_(
+            const EnqueueArgs&,
+            Ts...);
+common.cpp (rai) line 26 : 
+	"work": "9680625b39d3363d",
+	"signature": "ECDA914373A2F0CA1296475BAEE40500A7F0A7AD72A5A80C81D7FAB7F6C802B2CC7DB50F5DD0FB25B2EF11761FA7344A158DD5A700B21BD47DE5BD0F63153A02"
+})%%%";
+
+char const * beta_genesis_data = R"%%%({
+common.cpp (rai) line 35 : 
+	"work": "869e17b2bfa36639",
+	"signature": "34DF447C7F185673128C3516A657DFEC7906F16C68FB5A8879432E2E4FB908C8ED0DD24BBECFAB3C7852898231544A421DC8CB636EF66C82E1245083EB08EA0F"
+})%%%";
+
+char const * live_genesis_data = R"%%%({
+common.cpp (rai) line 44 : 
+	"work": "62f05417dd3fb691",
+	"signature": "9F0C933C8ADE004D808EA1985FA746A7E95BA2A38F867640F53EC8F180BDFE9E2C1268DEAD7C2664F356E37ABA362BC58E46DBA03E523A7B5A19E4B6EB12BB02"
+})%%%";
+
+class ledger_constants
+rai::vote::operator== in common.cpp (rai) : 
+{
+	return sequence == other_a.sequence && *block == *other_a.block && account == other_a.account && signature == other_a.signature;
+}
+
+bool rai::vote::operator!= (rai::vote const & other_a) const
+rai::vote::to_json in common.cpp (rai) : 
+	tree.put ("account", account.to_account ());
+	tree.put ("signature", signature.number ());
+	tree.put ("sequence", std::to_string (sequence));
+	tree.put ("block", block->to_json ());
+	boost::property_tree::write_json (stream, tree);
+rai::vote::vote in common.cpp (rai) : 
+account (other_a.account),
+signature (other_a.signature)
+{
+}
+
+rai::vote::vote in common.cpp (rai) : 
+		{
+			error_a = rai::read (stream_a, signature.bytes);
+			if (!error_a)
+			{
+				error_a = rai::read (stream_a, sequence);
+rai::vote::vote in common.cpp (rai) : 
+		{
+			error_a = rai::read (stream_a, signature.bytes);
+			if (!error_a)
+			{
+				error_a = rai::read (stream_a, sequence);
+rai::vote::vote in common.cpp (rai) : 
+account (account_a),
+signature (rai::sign_message (prv_a, account_a, hash ()))
+{
+}
+
+rai::vote::vote in common.cpp (rai) : 
+	assert (!error);
+	error = rai::read (stream, signature.bytes);
+	assert (!error);
+	error = rai::read (stream, sequence);
+	assert (!error);
+rai::vote::serialize in common.cpp (rai) : 
+	write (stream_a, account);
+	write (stream_a, signature);
+	write (stream_a, sequence);
+	block->serialize (stream_a);
+}
+rai::vote::serialize in common.cpp (rai) : 
+	write (stream_a, account);
+	write (stream_a, signature);
+	write (stream_a, sequence);
+	rai::serialize_block (stream_a, *block);
+}
+rai::vote::deserialize in common.cpp (rai) : 
+	{
+		result = read (stream_a, signature);
+		if (!result)
+		{
+			result = read (stream_a, sequence);
+rai::vote::validate in common.cpp (rai) : 
+{
+	auto result (rai::validate_message (account, hash (), signature));
+	return result;
+}
+
+common.cpp (rai\node) line 588 : 
+
+rai::node_id_handshake::node_id_handshake (boost::optional<rai::uint256_union> query, boost::optional<std::pair<rai::account, rai::signature>> response) :
+message (rai::message_type::node_id_handshake),
+query (query),
+response (response)
+rai::node_id_handshake::deserialize in common.cpp (rai\node) : 
+		{
+			rai::signature response_signature;
+			result = read (stream_a, response_signature);
+			if (!result)
+			{
+				response = std::make_pair (response_account, response_signature);
+			}
+		}
+	}
+rai::vote in common.hpp (rai) : 
+	rai::account account;
+	// Signature of sequence + block hash
+	rai::signature signature;
+};
+enum class vote_code
+{
+rai::process_result in common.hpp (rai) : 
+	progress, // Hasn't been seen before, signed correctly
+	bad_signature, // Signature was bad, forged or transmission error
+	old, // Already seen and was valid
+	negative_spend, // Malicious attempt to spend a negative amount
+	fork, // Malicious fork based on previous
+rai::node_id_handshake in common.hpp (rai\node) : 
+	node_id_handshake (bool &, rai::stream &, rai::message_header const &);
+	node_id_handshake (boost::optional<rai::block_hash>, boost::optional<std::pair<rai::account, rai::signature>>);
+	bool deserialize (rai::stream &) override;
+	void serialize (rai::stream &) override;
+	void visit (rai::message_visitor &) const override;
+rai::node_id_handshake in common.hpp (rai\node) : 
+	boost::optional<rai::uint256_union> query;
+	boost::optional<std::pair<rai::account, rai::signature>> response;
+	static size_t constexpr query_flag = 0;
+	static size_t constexpr response_flag = 1;
+};
+ed25519-donna.h (ed25519-donna\fuzz) line 5 : 
+
+typedef unsigned char ed25519_signature[64];
+typedef unsigned char ed25519_public_key[32];
+typedef unsigned char ed25519_secret_key[32];
+
+ed25519-donna.h (ed25519-donna\fuzz) line 12 : 
+void ed25519_publickey(const ed25519_secret_key sk, ed25519_public_key pk);
+int ed25519_sign_open(const unsigned char *m, size_t mlen, const ed25519_public_key pk, const ed25519_signature RS);
+void ed25519_sign(const unsigned char *m, size_t mlen, const ed25519_secret_key sk, const ed25519_public_key pk, ed25519_signature RS);
+
+int ed25519_sign_open_batch(const unsigned char **m, size_t *mlen, const unsigned char **pk, const unsigned char **RS, size_t num, int *valid);
+
+ed25519-donna.h (ed25519-donna\fuzz) line 23 : 
+void ed25519_publickey_sse2(const ed25519_secret_key sk, ed25519_public_key pk);
+int ed25519_sign_open_sse2(const unsigned char *m, size_t mlen, const ed25519_public_key pk, const ed25519_signature RS);
+void ed25519_sign_sse2(const unsigned char *m, size_t mlen, const ed25519_secret_key sk, const ed25519_public_key pk, ed25519_signature RS);
+
+int ed25519_sign_open_batch_sse2(const unsigned char **m, size_t *mlen, const unsigned char **pk, const unsigned char **RS, size_t num, int *valid);
+
+ed25519.c (ed25519-donna) line 34 : 
+static void
+ed25519_hram(hash_512bits hram, const ed25519_signature RS, const ed25519_public_key pk, const unsigned char *m, size_t mlen) {
+	ed25519_hash_context ctx;
+	ed25519_hash_init(&ctx);
+	ed25519_hash_update(&ctx, RS, 32);
+ed25519.c (ed25519-donna) line 58 : 
+void
+ED25519_FN(ed25519_sign) (const unsigned char *m, size_t mlen, const ed25519_secret_key sk, const ed25519_public_key pk, ed25519_signature RS) {
+	ed25519_hash_context ctx;
+	bignum256modm r, S, a;
+	ge25519 ALIGN(16) R;
+ed25519.c (ed25519-donna) line 93 : 
+int
+ED25519_FN(ed25519_sign_open) (const unsigned char *m, size_t mlen, const ed25519_public_key pk, const ed25519_signature RS) {
+	ge25519 ALIGN(16) R, A;
+	hash_512bits hash;
+	bignum256modm hram, S;
+ed25519.h (ed25519-donna) line 9 : 
+
+typedef unsigned char ed25519_signature[64];
+typedef unsigned char ed25519_public_key[32];
+typedef unsigned char ed25519_secret_key[32];
+
+ed25519.h (ed25519-donna) line 16 : 
+void ed25519_publickey(const ed25519_secret_key sk, ed25519_public_key pk);
+int ed25519_sign_open(const unsigned char *m, size_t mlen, const ed25519_public_key pk, const ed25519_signature RS);
+void ed25519_sign(const unsigned char *m, size_t mlen, const ed25519_secret_key sk, const ed25519_public_key pk, ed25519_signature RS);
+
+int ed25519_sign_open_batch(const unsigned char **m, size_t *mlen, const unsigned char **pk, const unsigned char **RS, size_t num, int *valid);
+
+main in entry.cpp (rai\rai_node) : 
+		("debug_profile_kdf", "Profile kdf function")
+		("debug_verify_profile", "Profile signature verification")
+		("debug_profile_sign", "Profile signature generation")
+		("platform", boost::program_options::value<std::string> (), "Defines the <platform> for OpenCL commands")
+		("device", boost::program_options::value<std::string> (), "Defines <device> for OpenCL command")
+		("threads", boost::program_options::value<std::string> (), "Defines <threads> count for OpenCL command");
+main in entry.cpp (rai\rai_node) : 
+		rai::uint256_union message;
+		rai::uint512_union signature;
+		signature = rai::sign_message (key.prv, key.pub, message);
+		auto begin (std::chrono::high_resolution_clock::now ());
+		for (auto i (0u); i < 1000; ++i)
+		{
+			rai::validate_message (key.pub, message, signature);
+		}
+		auto end (std::chrono::high_resolution_clock::now ());
+		std::cerr << "Signature verifications " << std::chrono::duration_cast<std::chrono::microseconds> (end - begin).count () << std::endl;
+	}
+	else if (vm.count ("debug_profile_sign"))
+	{
+testing::internal::CountIf in gtest-internal-inl.h (gtest\src) : 
+  // Implemented as an explicit loop since std::count_if() in libCstd on
+  // Solaris has a non-standard signature.
+  int count = 0;
+  for (typename Container::const_iterator it = c.begin(); it != c.end(); ++it) {
+    if (predicate(*it))
+testing::internal in gtest-internal.h (gtest\include\gtest\internal) : 
+// picked by the compiler.  These helpers have no implementations, as
+// we only need their signatures.
+//
+// Given IsNullLiteralHelper(x), the compiler will pick the first
+// version if x can be implicitly converted to Secret*, and pick the
+testing in gtest.h (gtest\include\gtest) : 
+// The convenience class for users who need to override just one or two
+// methods and are not concerned that a possible change to a signature of
+// the methods they override will not be caught during the build.  For
+// comments about each method please see the definition of TestEventListener
+// above.
+TEST in interface.cpp (rai\core_test) : 
+	rai::send_block send (0, 0, 0, key, pub, 0);
+	ASSERT_FALSE (rai::validate_message (pub, send.hash (), send.signature));
+	send.signature.bytes[0] ^= 1;
+	ASSERT_TRUE (rai::validate_message (pub, send.hash (), send.signature));
+	auto transaction (xrb_sign_transaction (send.to_json ().c_str (), key.data.bytes.data ()));
+	boost::property_tree::ptree block_l;
+	std::string transaction_l (transaction);
+TEST in interface.cpp (rai\core_test) : 
+	ASSERT_NE (nullptr, send1);
+	ASSERT_FALSE (rai::validate_message (pub, send.hash (), send1->signature));
+	free (transaction);
+}
+
+xrb_sign_transaction in interface.cpp (rai\lib) : 
+			prv.data = *reinterpret_cast<rai::uint256_union *> (private_key);
+			block->signature_set (rai::sign_message (prv, pub, block->hash ()));
+			auto json (block->to_json ());
+			result = reinterpret_cast<char *> (malloc (json.size () + 1));
+			strncpy (result, json.c_str (), json.size () + 1);
+interface.h (rai\lib) line 9 : 
+typedef unsigned char * xrb_uint256; // 32byte array for public and private keys
+typedef unsigned char * xrb_uint512; // 64byte array for signatures
+typedef void * xrb_transaction;
+
+// Convert amount bytes 'source' to a 39 byte not-null-terminated decimal string 'destination'
+interface.h (rai\lib) line 42 : 
+
+// Sign 'transaction' using 'private_key' and write to 'signature'
+char * xrb_sign_transaction (const char * transaction, const xrb_uint256 private_key);
+// Generate work for 'transaction'
+char * xrb_work_transaction (const char * transaction);
+ledger_processor::state_block_impl in ledger.cpp (rai) : 
+	{
+		result.code = validate_message (block_a.hashables.account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Unambiguous)
+		if (result.code == rai::process_result::progress)
+		{
+			result.code = block_a.hashables.account.is_zero () ? rai::process_result::opened_burn_account : rai::process_result::progress; // Is this for the burn account? (Unambiguous)
+ledger_processor::change_block in ledger.cpp (rai) : 
+					assert (info.head == block_a.hashables.previous);
+					result.code = validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Malformed)
+					if (result.code == rai::process_result::progress)
+					{
+						ledger.store.block_put (transaction, hash, block_a);
+ledger_processor::send_block in ledger.cpp (rai) : 
+				{
+					result.code = validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is this block signed correctly (Malformed)
+					if (result.code == rai::process_result::progress)
+					{
+						rai::account_info info;
+ledger_processor::receive_block in ledger.cpp (rai) : 
+					{
+						result.code = rai::validate_message (account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is the signature valid (Malformed)
+						if (result.code == rai::process_result::progress)
+						{
+							rai::account_info info;
+ledger_processor::open_block in ledger.cpp (rai) : 
+		{
+			result.code = rai::validate_message (block_a.hashables.account, hash, block_a.signature) ? rai::process_result::bad_signature : rai::process_result::progress; // Is the signature valid (Malformed)
+			if (result.code == rai::process_result::progress)
+			{
+				rai::account_info info;
+ledger.cpp (rai\core_test) line 756 : 
+
+TEST (votes, check_signature)
+{
+	rai::system system (24000, 1);
+	auto & node1 (*system.nodes[0]);
+TEST in ledger.cpp (rai\core_test) : 
+	auto vote1 (std::make_shared<rai::vote> (rai::test_genesis_key.pub, rai::test_genesis_key.prv, 1, send1));
+	vote1->signature.bytes[0] ^= 1;
+	ASSERT_EQ (rai::vote_code::invalid, node1.vote_processor.vote (vote1, rai::endpoint ()));
+	vote1->signature.bytes[0] ^= 1;
+	ASSERT_EQ (rai::vote_code::vote, node1.vote_processor.vote (vote1, rai::endpoint ()));
+	ASSERT_EQ (rai::vote_code::replay, node1.vote_processor.vote (vote1, rai::endpoint ()));
+}
+ledger.cpp (rai\core_test) line 1024 : 
+
+TEST (ledger, fail_change_bad_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in ledger.cpp (rai\core_test) : 
+	auto result1 (ledger.process (transaction, block));
+	ASSERT_EQ (rai::process_result::bad_signature, result1.code);
+}
+
+TEST (ledger, fail_change_fork)
+ledger.cpp (rai\core_test) line 1094 : 
+
+TEST (ledger, fail_send_bad_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in ledger.cpp (rai\core_test) : 
+	auto result1 (ledger.process (transaction, block));
+	ASSERT_EQ (rai::process_result::bad_signature, result1.code);
+}
+
+TEST (ledger, fail_send_negative_spend)
+ledger.cpp (rai\core_test) line 1180 : 
+
+TEST (ledger, fail_open_bad_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in ledger.cpp (rai\core_test) : 
+	rai::open_block block2 (block1.hash (), 1, key1.pub, key1.prv, key1.pub, 0);
+	block2.signature.clear ();
+	ASSERT_EQ (rai::process_result::bad_signature, ledger.process (transaction, block2).code);
+}
+
+TEST (ledger, fail_open_fork_previous)
+ledger.cpp (rai\core_test) line 1306 : 
+
+TEST (ledger, fail_receive_bad_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in ledger.cpp (rai\core_test) : 
+	auto result4 (ledger.process (transaction, block4));
+	ASSERT_EQ (rai::process_result::bad_signature, result4.code);
+}
+
+TEST (ledger, fail_receive_gap_previous_opened)
+TEST in network.cpp (rai\core_test) : 
+	open.hashables.source = latest;
+	open.signature = rai::sign_message (key2.prv, key2.pub, open.hash ());
+	ASSERT_EQ (rai::process_result::progress, system.nodes[0]->process (open).code);
+	auto connection (std::make_shared<rai::bootstrap_server> (nullptr, system.nodes[0]));
+	rai::genesis genesis;
+rai::network::send_node_id_handshake in node.cpp (rai\node) : 
+	assert (endpoint_a.address ().is_v6 ());
+	boost::optional<std::pair<rai::account, rai::signature>> response (boost::none);
+	if (respond_to)
+	{
+		response = std::make_pair (node.node_id.pub, rai::sign_message (node.node_id.prv, node.node_id.pub, *respond_to));
+rai::network::send_node_id_handshake in node.cpp (rai\node) : 
+	{
+		BOOST_LOG (node.log) << boost::str (boost::format ("Node ID handshake sent with node ID %1% to %2%: query %3%, respond_to %4% (signature %5%)") % node.node_id.pub.to_account () % endpoint_a % (query ? query->to_string () : std::string ("[none]")) % (respond_to ? respond_to->to_string () : std::string ("[none]")) % (response ? response->second.to_string () : std::string ("[none]")));
+	}
+	node.stats.inc (rai::stat::type::message, rai::stat::detail::node_id_handshake, rai::stat::dir::out);
+	std::weak_ptr<rai::node> node_w (node.shared ());
+network_message_visitor::node_id_handshake in node.cpp (rai\node) : 
+			{
+				BOOST_LOG (node.log) << boost::str (boost::format ("Failed to validate syn cookie signature %1% by %2%") % message_a.response->second.to_string () % message_a.response->first.to_account ());
+			}
+		}
+		if (!validated_response && !node.peers.known_peer (endpoint_l))
+rai::block_processor::process_receive_one in node.cpp (rai\node) : 
+		}
+		case rai::process_result::bad_signature:
+		{
+			if (node.config.logging.ledger_logging ())
+			{
+				BOOST_LOG (node.log) << boost::str (boost::format ("Bad signature for: %1%") % hash.to_string ());
+			}
+			break;
+		}
+node.cpp (rai\node) line 2035 : 
+
+bool rai::peer_container::validate_syn_cookie (rai::endpoint const & endpoint, rai::account node_id, rai::signature sig)
+{
+	auto ip_addr (endpoint.address ());
+	assert (ip_addr.is_v6 ());
+rai::peer_container in node.hpp (rai\node) : 
+	// Also removes the syn cookie from the store if valid
+	bool validate_syn_cookie (rai::endpoint const &, rai::account, rai::signature);
+	size_t size ();
+	size_t size_sqrt ();
+	bool empty ();
+numbers.cpp (rai\lib) line 424 : 
+
+bool rai::validate_message (rai::public_key const & public_key, rai::uint256_union const & message, rai::uint512_union const & signature)
+{
+	//auto result (0 != ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), public_key.bytes.data (), signature.bytes.data ()));
+	//return result;
+	return false;
+}
+rai::uint512_union in numbers.hpp (rai\lib) : 
+};
+// Only signatures are 512 bit.
+using signature = uint512_union;
+
+rai::uint512_union sign_message (rai::raw_key const &, rai::public_key const &, rai::uint256_union const &);
+bool validate_message (rai::public_key const &, rai::uint256_union const &, rai::uint512_union const &);
+processor_service.cpp (rai\core_test) line 8 : 
+
+TEST (processor_service, bad_send_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in processor_service.cpp (rai\core_test) : 
+	rai::block_hash hash1 (send.hash ());
+	send.signature.bytes[32] ^= 0x1;
+	ASSERT_EQ (rai::process_result::bad_signature, ledger.process (transaction, send).code);
+}
+
+TEST (processor_service, bad_receive_signature)
+{
+	bool init (false);
+	rai::block_store store (init, rai::unique_path ());
+TEST in processor_service.cpp (rai\core_test) : 
+	rai::receive_block receive (hash1, hash1, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+	receive.signature.bytes[32] ^= 0x1;
+	ASSERT_EQ (rai::process_result::bad_signature, ledger.process (transaction, receive).code);
+}
+
+TEST (alarm, one)
+TEST in qt.cpp (rai\qt_test) : 
+	send.hashables.balance.encode_hex (balance);
+	std::string signature;
+	send.signature.encode_hex (signature);
+	std::string block_json;
+	send.serialize_json (block_json);
+	block_json.erase (std::remove (block_json.begin (), block_json.end (), '\n'), block_json.end ());
+rai::rpc_handler::block_hash in rpc.cpp (rai\node) : 
+	boost::property_tree::read_json (block_stream, block_l);
+	block_l.put ("signature", "0");
+	block_l.put ("work", "0");
+	auto block (rai::deserialize_block_json (block_l));
+	if (block != nullptr)
+rai::rpc_handler::account_history in rpc.cpp (rai\node) : 
+									entry.put ("work", rai::to_string_hex (block->block_work ()));
+									entry.put ("signature", block->block_signature ().to_string ());
+								}
+								history.push_back (std::make_pair ("", entry));
+							}
+rai::rpc_handler::process in rpc.cpp (rai\node) : 
+				}
+				case rai::process_result::bad_signature:
+				{
+					error_response (response, "Bad signature");
+					break;
+				}
+				case rai::process_result::negative_spend:
+test_batch_instance in test.c (ed25519-donna) : 
+	ed25519_public_key pks[test_batch_count];
+	ed25519_signature sigs[test_batch_count];
+	unsigned char messages[test_batch_count][128];
+	size_t message_lengths[test_batch_count];
+	const unsigned char *message_pointers[test_batch_count];
+test_main in test.c (ed25519-donna) : 
+	ed25519_public_key pk;
+	ed25519_signature sig;
+	unsigned char forge[1024] = {'x'};
+	curved25519_key csk[2] = {{255}};
+	uint64_t ticks, pkticks = maxticks, signticks = maxticks, openticks = maxticks, curvedticks = maxticks;
+test_main in test.c (ed25519-donna) : 
+		ed25519_sign((unsigned char *)dataset[i].m, i, dataset[i].sk, pk, sig);
+		edassert_equal_round(dataset[i].sig, sig, sizeof(sig), i, "signature didn't match");
+		edassert(!ed25519_sign_open((unsigned char *)dataset[i].m, i, pk, sig), i, "failed to open message");
+
+		memcpy(forge, dataset[i].m, i);
+test_main in test.c (ed25519-donna) : 
+		timeit(ed25519_sign((unsigned char *)dataset[0].m, 0, dataset[0].sk, pk, sig), signticks)
+		edassert_equal_round(dataset[0].sig, sig, sizeof(sig), i, "signature didn't match");
+		timeit(res = ed25519_sign_open((unsigned char *)dataset[0].m, 0, pk, sig), openticks)
+		edassert(!res, 0, "failed to open message");
+		timeit(curved25519_scalarmult_basepoint(csk[1], csk[0]), curvedticks);
+test_main in test.c (ed25519-donna) : 
+	printf("%.0f ticks/public key generation\n", (double)pkticks);
+	printf("%.0f ticks/signature\n", (double)signticks);
+	printf("%.0f ticks/signature verification\n", (double)openticks);
+	printf("%.0f ticks/curve25519 basepoint scalarmult\n", (double)curvedticks);
+}
+
