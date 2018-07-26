@@ -1,0 +1,23 @@
+---- get_rpc Matches (4 in 4 files) ----
+rai_daemon::daemon::run in daemon.cpp (rai\rai_node) : 
+				node->start ();
+				std::unique_ptr<rai::rpc> rpc = get_rpc (service, *node, config.rpc);
+				if (rpc && config.rpc_enable)
+				{
+					rpc->start ();
+run_wallet in entry.cpp (rai\rai_wallet) : 
+			node->start ();
+			std::unique_ptr<rai::rpc> rpc = get_rpc (service, *node, config.rpc);
+			if (rpc && config.rpc_enable)
+			{
+				rpc->start ();
+rpc.cpp (rai\node) line 5242 : 
+
+std::unique_ptr<rai::rpc> rai::get_rpc (boost::asio::io_service & service_a, rai::node & node_a, rai::rpc_config const & config_a)
+{
+	std::unique_ptr<rpc> impl;
+
+rai in rpc.hpp (rai\node) : 
+/** Returns the correct RPC implementation based on TLS configuration */
+std::unique_ptr<rai::rpc> get_rpc (boost::asio::io_service & service_a, rai::node & node_a, rai::rpc_config const & config_a);
+}
