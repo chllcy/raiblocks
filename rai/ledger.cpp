@@ -590,7 +590,7 @@ std::map<rai::uint128_t, std::shared_ptr<rai::block>, std::greater<rai::uint128_
 	std::map<rai::uint128_t, std::shared_ptr<rai::block>, std::greater<rai::uint128_t>> result;
 	for (auto & i : totals)
 	{
-		std::cerr << "rai::ledger::tally4:" << i.first.to_string() << "," << i.second->to_json() << "\n";	
+		std::cerr << "rai::ledger::tally4:" << i.first->to_json() << "\n";	
 		result[i.second] = i.first;
 	}
 	return result;
