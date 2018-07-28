@@ -1000,7 +1000,9 @@ std::shared_ptr<rai::block> rai::wallet::send_action (rai::account const & sourc
 						assert (rep_block != nullptr);
 						uint64_t cached_work (0);
 						store.work_get (transaction, source_a, cached_work);
+						BOOST_LOG (node.log) << "rai::wallet::send_action1:" << block->to_json();
 						block.reset (new rai::state_block (source_a, info.head, rep_block->representative (), balance - amount_a, account_a, prv, source_a, cached_work));
+						BOOST_LOG (node.log) << "rai::wallet::send_action2:" << block->to_json();
 						if (id_mdb_val)
 						{
 							auto status (mdb_put (transaction, node.wallets.send_action_ids, *id_mdb_val, rai::mdb_val (block->hash ()), 0));
@@ -1019,14 +1021,18 @@ std::shared_ptr<rai::block> rai::wallet::send_action (rai::account const & sourc
 	{
 		if (rai::work_validate (*block))
 		{
+			BOOST_LOG (node.log) << "rai::wallet::send_action3:" << block->to_json();
 			node.work_generate_blocking (*block);
 		}
+		BOOST_LOG (node.log) << "rai::wallet::send_action4:" << block->to_json();
 		node.process_active (block);
 		node.block_processor.flush ();
+		BOOST_LOG (node.log) << "rai::wallet::send_action5:" << block->to_json();
 		if (generate_work_a)
 		{
 			work_ensure (source_a, block->hash ());
 		}
+		BOOST_LOG (node.log) << "rai::wallet::send_action6:" << block->to_json();
 	}
 	return block;
 }
