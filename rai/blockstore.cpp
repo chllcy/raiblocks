@@ -1230,13 +1230,16 @@ std::shared_ptr<rai::vote> rai::block_store::vote_current (MDB_txn * transaction
 	assert (!cache_mutex.try_lock ());
 	std::shared_ptr<rai::vote> result;
 	auto existing (vote_cache.find (account_a));
+	std::cerr << "rai::block_store::vote_current1: " << account_a.to_string();
 	if (existing != vote_cache.end ())
 	{
 		result = existing->second;
+		std::cerr << "rai::block_store::vote_current2: " << result->to_json();
 	}
 	else
 	{
 		result = vote_get (transaction_a, account_a);
+		std::cerr << "rai::block_store::vote_current3: " << result->to_json();
 	}
 	return result;
 }
@@ -1248,6 +1251,7 @@ std::shared_ptr<rai::vote> rai::block_store::vote_generate (MDB_txn * transactio
 	uint64_t sequence ((result ? result->sequence : 0) + 1);
 	result = std::make_shared<rai::vote> (account_a, key_a, sequence, block_a);
 	vote_cache[account_a] = result;
+	std::cerr << "rai::block_store::vote_generate: " << account_a.to_string() << "," << result->to_json();
 	return result;
 }
 
@@ -1264,6 +1268,7 @@ std::shared_ptr<rai::vote> rai::block_store::vote_max (MDB_txn * transaction_a, 
 		}
 	}
 	vote_cache[vote_a->account] = result;
+	std::cerr << "rai::block_store::vote_max: " << vote_a->account.to_string() << "," << result->to_json();
 	return result;
 }
 

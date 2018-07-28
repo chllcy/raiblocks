@@ -3641,14 +3641,15 @@ bool rai::active_transactions::start (std::pair<std::shared_ptr<rai::block>, std
 {
 	assert (blocks_a.first != nullptr);
 	std::lock_guard<std::mutex> lock (mutex);
-	BOOST_LOG (node.log) << "rai::active_transactions::start1:" << blocks_a.first.to_json();
+	BOOST_LOG (node.log) << "rai::active_transactions::start1:" << blocks_a->first.to_json();
 	auto primary_block (blocks_a.first);
-	BOOST_LOG (node.log) << "rai::active_transactions::start2:" << primary_block.to_json();
+	BOOST_LOG (node.log) << "rai::active_transactions::start2:" << primary_block->to_json();
 	auto root (primary_block->root ());
 	BOOST_LOG (node.log) << "rai::active_transactions::start3:" << root.to_string();
 	auto existing (roots.find (root));
 	if (existing == roots.end ())
 	{
+		BOOST_LOG (node.log) << "rai::active_transactions::start4:";
 		auto election (std::make_shared<rai::election> (node, primary_block, confirmation_action_a));
 		roots.insert (rai::conflict_info{ root, election, 0, blocks_a });
 	}
