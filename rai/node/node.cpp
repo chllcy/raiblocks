@@ -3641,7 +3641,7 @@ bool rai::active_transactions::start (std::pair<std::shared_ptr<rai::block>, std
 {
 	assert (blocks_a.first != nullptr);
 	std::lock_guard<std::mutex> lock (mutex);
-	BOOST_LOG (node.log) << "rai::active_transactions::start1:" << blocks_a->first.to_json();
+	BOOST_LOG (node.log) << "rai::active_transactions::start1:" << blocks_a.first->to_json();
 	auto primary_block (blocks_a.first);
 	BOOST_LOG (node.log) << "rai::active_transactions::start2:" << primary_block->to_json();
 	auto root (primary_block->root ());
