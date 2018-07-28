@@ -1356,11 +1356,11 @@ void rai::wallets::foreach_representative (MDB_txn * transaction_a, std::functio
 	for (auto i (items.begin ()), n (items.end ()); i != n; ++i)
 	{
 		auto & wallet (*i->second);
-		BOOST_LOG (node.log) << "foreach_representative2: ";
+		BOOST_LOG (node.log) << "foreach_representative2: " << wallet.to_string();
 		for (auto j (wallet.store.begin (transaction_a)), m (wallet.store.end ()); j != m; ++j)
 		{
 			rai::account account (j->first.uint256 ());
-			BOOST_LOG (node.log) << "foreach_representative3 ";
+			BOOST_LOG (node.log) << "foreach_representative3 " << account.to_string();
 			if (!node.ledger.weight (transaction_a, account).is_zero ())
 			{
 				BOOST_LOG (node.log) << "foreach_representative4 ";
