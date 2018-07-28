@@ -571,11 +571,14 @@ std::map<rai::uint128_t, std::shared_ptr<rai::block>, std::greater<rai::uint128_
 {
 	std::unordered_map<std::shared_ptr<block>, rai::uint128_t, rai::shared_ptr_block_hash, rai::shared_ptr_block_hash> totals;
 	// Construct a map of blocks -> vote total.
+	std::cerr << "rai::ledger::tally1:" << votes_a.rep_votes.size() << "\n";
 	for (auto & i : votes_a.rep_votes)
 	{
 		auto existing (totals.find (i.second));
+		std::cerr << "rai::ledger::tally2:" << i.first.to_string() << "," << i.second->to_json() << "\n";		
 		if (existing == totals.end ())
 		{
+			std::cerr << "rai::ledger::tally3:" << "\n";
 			totals.insert (std::make_pair (i.second, 0));
 			existing = totals.find (i.second);
 			assert (existing != totals.end ());
@@ -587,6 +590,7 @@ std::map<rai::uint128_t, std::shared_ptr<rai::block>, std::greater<rai::uint128_
 	std::map<rai::uint128_t, std::shared_ptr<rai::block>, std::greater<rai::uint128_t>> result;
 	for (auto & i : totals)
 	{
+		std::cerr << "rai::ledger::tally4:" << i.first.to_string() << "," << i.second->to_json() << "\n";	
 		result[i.second] = i.first;
 	}
 	return result;

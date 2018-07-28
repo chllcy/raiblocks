@@ -115,12 +115,12 @@ id (block_a->root ())
 
 rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 {
-	//OST_LOG (node.log) << "rai::votes::vote:" ;
+	std::cerr << "rai::votes::vote:" << vote_a->account.to_string();
 	rai::tally_result result;
 	auto existing (rep_votes.find (vote_a->account));
 	if (existing == rep_votes.end ())
 	{
-		//OST_LOG (node.log) << "rai::votes::vote1" ;
+		std::cerr << "rai::votes::vote1:" << vote_a->account.to_string() << "," <<  vote_a->block->to_json() << "\n";
 		// Vote on this block hasn't been seen from rep before
 		result = rai::tally_result::vote;
 		rep_votes.insert (std::make_pair (vote_a->account, vote_a->block));
@@ -129,14 +129,14 @@ rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 	{
 		if (!(*existing->second == *vote_a->block))
 		{
-			//OST_LOG (node.log) << "rai::votes::vote2";
+			std::cerr << "rai::votes::vote2" << vote_a->block->to_json() << "\n";
 			// Rep changed their vote
 			result = rai::tally_result::changed;
 			existing->second = vote_a->block;
 		}
 		else
 		{
-			 //OST_LOG (node.log) << "rai::votes::vote3";
+			 std::cerr << "rai::votes::vote3";
 			// Rep vote remained the same
 			result = rai::tally_result::confirm;
 		}
