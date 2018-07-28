@@ -1000,7 +1000,7 @@ std::shared_ptr<rai::block> rai::wallet::send_action (rai::account const & sourc
 						assert (rep_block != nullptr);
 						uint64_t cached_work (0);
 						store.work_get (transaction, source_a, cached_work);
-						BOOST_LOG (node.log) << "rai::wallet::send_action1:" << block->to_json();
+						//BOOST_LOG (node.log) << "rai::wallet::send_action1:" << block->to_json();
 						block.reset (new rai::state_block (source_a, info.head, rep_block->representative (), balance - amount_a, account_a, prv, source_a, cached_work));
 						BOOST_LOG (node.log) << "rai::wallet::send_action2:" << block->to_json();
 						if (id_mdb_val)
