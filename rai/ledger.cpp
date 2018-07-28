@@ -182,7 +182,7 @@ void ledger_processor::state_block (rai::state_block const & block_a)
 
 void ledger_processor::state_block_impl (rai::state_block const & block_a)
 {
-	std::cerr << "ledger_processor::state_block1 "<< std::endl;
+	std::cerr << "ledger_processor::state_block1 "<< block_a.to_json() << std::endl;
 	auto hash (block_a.hash ());
 	auto existing (ledger.store.block_exists (transaction, hash));
 	result.code = existing ? rai::process_result::old : rai::process_result::progress; // Have we seen this block before? (Unambiguous)
@@ -212,7 +212,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 						result.code = ledger.store.block_exists (transaction, block_a.hashables.previous) ? rai::process_result::progress : rai::process_result::gap_previous; // Does the previous block exist in the ledger? (Unambigious)
 						if (result.code == rai::process_result::progress)
 						{
-							std::cerr << "ledger_processor::state_block7 "<< std::endl;
+							std::cerr << "ledger_processor::state_block7 " <<block_a.hashables.balance.to_string() << "," << info.balance.to_string() << std::endl;
 							is_send = block_a.hashables.balance < info.balance;
 							result.amount = is_send ? (info.balance.number () - result.amount.number ()) : (result.amount.number () - info.balance.number ());
 							result.code = block_a.hashables.previous == info.head ? rai::process_result::progress : rai::process_result::fork; // Is the previous block the account's head block? (Ambigious)
@@ -292,7 +292,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 						ledger.store.pending_del (transaction, rai::pending_key (block_a.hashables.account, block_a.hashables.link));
 						ledger.stats.inc (rai::stat::type::ledger, rai::stat::detail::receive);
 					}
-						std::cerr << "ledger_processor::state_block20 "<< std::endl;
+					std::cerr << "ledger_processor::state_block20 "<< std::endl;
 
 					ledger.change_latest (transaction, block_a.hashables.account, hash, hash, block_a.hashables.balance, info.block_count + 1, true);
 					if (!ledger.store.frontier_get (transaction, info.head).is_zero ())
@@ -306,6 +306,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 			}
 		}
 	}
+	std::cerr << "ledger_processor::state_block22 " << block_a.to_json() << std::endl;
 }
 
 void ledger_processor::change_block (rai::change_block const & block_a)
