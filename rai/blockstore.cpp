@@ -1239,7 +1239,7 @@ std::shared_ptr<rai::vote> rai::block_store::vote_current (MDB_txn * transaction
 	else
 	{
 		result = vote_get (transaction_a, account_a);
-		std::cerr << "rai::block_store::vote_current3: " << result->to_json() << "\n";
+		std::cerr << "rai::block_store::vote_current3: \n";// << result->to_json() << "\n";
 	}
 	return result;
 }
