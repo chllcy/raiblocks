@@ -115,7 +115,7 @@ id (block_a->root ())
 
 rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 {
-	std::cerr << "rai::votes::vote:" << vote_a->account.to_string();
+	std::cerr << "rai::votes::vote:" << vote_a->account.to_string() "\n";
 	rai::tally_result result;
 	auto existing (rep_votes.find (vote_a->account));
 	if (existing == rep_votes.end ())
@@ -136,7 +136,7 @@ rai::tally_result rai::votes::vote (std::shared_ptr<rai::vote> vote_a)
 		}
 		else
 		{
-			 std::cerr << "rai::votes::vote3";
+			 std::cerr << "rai::votes::vote3 \n";
 			// Rep vote remained the same
 			result = rai::tally_result::confirm;
 		}

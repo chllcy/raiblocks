@@ -2730,7 +2730,7 @@ public:
 
 void rai::node::process_confirmed (std::shared_ptr<rai::block> block_a)
 {
-	BOOST_LOG (log) << "rai::node::process_confirmed";
+	BOOST_LOG (log) << "rai::node::process_confirmed" << block_a->to_json();
 	rai::transaction transaction (store.environment, nullptr, false);
 	auto hash (block_a->hash ());
 	if (store.block_exists (transaction, hash))
@@ -3406,7 +3406,7 @@ void rai::election::confirm_once (MDB_txn * transaction_a)
 	BOOST_LOG (node.log) << "confirm_once1 ";
 	if (!confirmed.exchange (true))
 	{
-		BOOST_LOG (node.log) << "confirm_once2";
+		BOOST_LOG (node.log) << "confirm_once2:" << confirmed;
 		auto winner_l (status.winner);
 		auto node_l (node.shared ());
 		auto confirmation_action_l (confirmation_action);
