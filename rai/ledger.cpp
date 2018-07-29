@@ -268,6 +268,8 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					ledger.stats.inc (rai::stat::type::ledger, rai::stat::detail::state_block);
 					result.state_is_send = is_send;
 					ledger.store.block_put (transaction, hash, block_a);
+					//删除之前的记录
+					ledger.store.block_del(transaction, block_a.previous());
 
 					if (!info.rep_block.is_zero ())
 					{

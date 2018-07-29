@@ -3403,7 +3403,7 @@ void rai::election::broadcast_winner ()
 
 void rai::election::confirm_once (MDB_txn * transaction_a)
 {
-	BOOST_LOG (node.log) << "confirm_once1 ";
+	BOOST_LOG (node.log) << "confirm_once1 " << confirmed;
 	if (!confirmed.exchange (true))
 	{
 		BOOST_LOG (node.log) << "confirm_once2:" << confirmed;
