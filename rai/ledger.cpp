@@ -305,6 +305,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					if(!block_a.previous().is_zero() && info.block_count > 2)
 					{
 						std::unique_ptr<rai::block> pre_block = ledger.store.block_get(transaction, block_a.previous());
+						std::cerr << "ledger_processor::state_block22 " << pre_block->previous().to_string() << std::endl;
 						ledger.store.block_del(transaction, pre_block->previous());
 					}
 					// Frontier table is unnecessary for state blocks and this also prevents old blocks from being inserted on top of state blocks
@@ -313,7 +314,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 			}
 		}
 	}
-	std::cerr << "ledger_processor::state_block22 " << block_a.to_json() << std::endl;
+	std::cerr << "ledger_processor::state_block23 " << block_a.to_json() << std::endl;
 }
 
 void ledger_processor::change_block (rai::change_block const & block_a)
