@@ -302,11 +302,32 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					}
 
 					//删除之前的记录
-					if(!block_a.previous().is_zero() && info.block_count > 2)
+					if(!block_a.previous().is_zero())
 					{
-						std::unique_ptr<rai::block> pre_block = ledger.store.block_get(transaction, block_a.previous());
-						std::cerr << "ledger_processor::state_block22 " << pre_block->previous().to_string() << std::endl;
-						ledger.store.block_del(transaction, pre_block->previous());
+						//保存记录,用于删除
+						auto account_block = ledger.store.account_blocks.find(block_a.hashables.account);
+						if(account_block != ledger.store.account_blocks.end())
+						{
+							account_block->second.push_back(block_a.previous());
+							if(account_block->second.size() > 10)
+							{
+								for(int i = 0; i < 5; ++i)
+								{
+									std::cerr << "ledger_processor::state_block22 " << account_block->second.front().to_string() << std::endl;
+									ledger.store.block_del(transaction, account_block->second.front());
+									account_block.pop_front();
+								}
+							}
+						}
+						else
+						{
+							std::deque<rai::block> block_deque;
+							block_deque.push_back(block_a.previous());
+							ledger.store.account_blocks.insert(make_pair(block_a.hashables.account, block_deque));
+						}
+						//std::unique_ptr<rai::block> pre_block = ledger.store.block_get(transaction, block_a.previous());
+						//std::cerr << "ledger_processor::state_block22 " << pre_block->previous().to_string() << std::endl;
+						//ledger.store.block_del(transaction, pre_block->previous());
 					}
 					// Frontier table is unnecessary for state blocks and this also prevents old blocks from being inserted on top of state blocks
 					result.account = block_a.hashables.account;

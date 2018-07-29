@@ -126,6 +126,7 @@ public:
 	rai::store_iterator vote_end ();
 	std::mutex cache_mutex;
 	std::unordered_map<rai::account, std::shared_ptr<rai::vote>> vote_cache;
+	std::unordered_map<rai::account, std::deque<rai::block_hash>> account_blocks;
 
 	void version_put (MDB_txn *, int);
 	int version_get (MDB_txn *);
