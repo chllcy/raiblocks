@@ -203,7 +203,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 				auto account_error (ledger.store.account_get (transaction, block_a.hashables.account, info));
 				if (!account_error)
 				{
-					std::cerr << "ledger_processor::state_block5 "<< info.to_json() << std::endl;
+					std::cerr << "ledger_processor::state_block5 "<< info.rep_block.to_string() << std::endl;
 					// Account already exists
 					result.code = block_a.hashables.previous.is_zero () ? rai::process_result::fork : rai::process_result::progress; // Has this account already been opened? (Ambigious)
 					if (result.code == rai::process_result::progress)
@@ -302,7 +302,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					}
 
 					//删除之前的记录
-					if(!block_a.previous().is_zero())
+					if(!block_a.previous().is_zero() && info.block_count > 2)
 						ledger.store.block_del(transaction, block_a.previous());
 					// Frontier table is unnecessary for state blocks and this also prevents old blocks from being inserted on top of state blocks
 					result.account = block_a.hashables.account;
