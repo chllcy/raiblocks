@@ -315,7 +315,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 								{
 									std::cerr << "ledger_processor::state_block22 " << account_block->second.front().to_string() << std::endl;
 									ledger.store.block_del(transaction, account_block->second.front());
-									account_block.pop_front();
+									account_block->second.pop_front();
 								}
 							}
 						}
