@@ -303,7 +303,10 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 
 					//删除之前的记录
 					if(!block_a.previous().is_zero() && info.block_count > 2)
-						ledger.store.block_del(transaction, block_a.previous());
+					{
+						std::unique_ptr<rai::block> pre_block = ledger.store.block_get(transaction, block_a.previous());
+						ledger.store.block_del(transaction, pre_block.previous());
+					}
 					// Frontier table is unnecessary for state blocks and this also prevents old blocks from being inserted on top of state blocks
 					result.account = block_a.hashables.account;
 				}
