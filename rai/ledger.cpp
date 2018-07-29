@@ -321,7 +321,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 						}
 						else
 						{
-							std::deque<rai::block> block_deque;
+							std::deque<rai::block_hash> block_deque;
 							block_deque.push_back(block_a.previous());
 							ledger.store.account_blocks.insert(make_pair(block_a.hashables.account, block_deque));
 						}
