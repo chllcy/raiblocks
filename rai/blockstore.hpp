@@ -121,6 +121,9 @@ public:
 	std::shared_ptr<rai::vote> vote_max (MDB_txn *, std::shared_ptr<rai::vote>);
 	// Return latest vote for an account considering the vote cache
 	std::shared_ptr<rai::vote> vote_current (MDB_txn *, rai::account const &);
+
+	void get_mdb_stat (MDB_txn *txn);
+	
 	void flush (MDB_txn *);
 	rai::store_iterator vote_begin (MDB_txn *);
 	rai::store_iterator vote_end ();

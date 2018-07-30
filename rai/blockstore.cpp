@@ -1289,3 +1289,21 @@ rai::store_iterator rai::block_store::latest_end ()
 	rai::store_iterator result (nullptr);
 	return result;
 }
+
+#define STDOUTSTAT(DBI) mdb_stat (txn, DBI,  stat); std::cerr<<#DBI <<":" << stat->ms_psize << "," << stat->ms_depth << ","<< stat->ms_branch_pages << ","<< stat->ms_leaf_pages << "," << stat->ms_overflow_pages << "," << stat->ms_entries << "\n"; 
+void rai::block_store::get_mdb_stat (MDB_txn *txn)
+{
+	MDB_stat *stat;
+	
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	STDOUTSTAT(frontiers)
+	
+}
+

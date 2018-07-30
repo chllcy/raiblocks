@@ -335,6 +335,7 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 			}
 		}
 	}
+	ledger.store.get_mdb_stat(transaction);
 	std::cerr << "ledger_processor::state_block23 " << block_a.to_json() << std::endl;
 }
 
