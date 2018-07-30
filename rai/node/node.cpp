@@ -1704,7 +1704,7 @@ stats (config.stat_config)
 	});
 	observers.endpoint.add ([this](rai::endpoint const & endpoint_a) {
 		this->network.send_keepalive (endpoint_a);
-		rep_query (*this, endpoint_a);
+		//rep_query (*this, endpoint_a);
 	});
 	observers.vote.add ([this](std::shared_ptr<rai::vote> vote_a, rai::endpoint const &) {
 		this->gap_cache.vote (vote_a);
