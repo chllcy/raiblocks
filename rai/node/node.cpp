@@ -2271,7 +2271,7 @@ void rai::node::ongoing_rep_crawl ()
 {
 	auto now (std::chrono::steady_clock::now ());
 	auto peers_l (peers.rep_crawl ());
-	rep_query (*this, peers_l);
+	//rep_query (*this, peers_l);
 	if (network.on)
 	{
 		std::weak_ptr<rai::node> node_w (shared_from_this ());
