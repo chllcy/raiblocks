@@ -304,14 +304,15 @@ void ledger_processor::state_block_impl (rai::state_block const & block_a)
 					//删除之前的记录
 					if(!block_a.previous().is_zero())
 					{
+						std::cerr << "ledger_processor::state_block21.1 " << block_a.hashables.account.to_string() << std::endl;
 						//保存记录,用于删除
 						auto account_block = ledger.store.account_blocks.find(block_a.hashables.account);
 						if(account_block != ledger.store.account_blocks.end())
 						{
 							account_block->second.push_back(block_a.previous());
-							if(account_block->second.size() > 10)
+							if(account_block->second.size() > 3)
 							{
-								for(int i = 0; i < 5; ++i)
+								for(int i = 0; i < 1; ++i)
 								{
 									std::cerr << "ledger_processor::state_block22 " << account_block->second.front().to_string() << std::endl;
 									ledger.store.block_del(transaction, account_block->second.front());
