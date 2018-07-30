@@ -1290,20 +1290,26 @@ rai::store_iterator rai::block_store::latest_end ()
 	return result;
 }
 
-#define STDOUTSTAT(DBI) mdb_stat (txn, DBI,  stat); std::cerr<<#DBI <<":" << stat->ms_psize << "," << stat->ms_depth << ","<< stat->ms_branch_pages << ","<< stat->ms_leaf_pages << "," << stat->ms_overflow_pages << "," << stat->ms_entries << "\n"; 
+#define STDOUTSTAT(DBI,stat) mdb_stat (txn, DBI,  &stat); std::cerr<<#DBI <<":" << stat->ms_psize << "," << stat->ms_depth << ","<< stat->ms_branch_pages << ","<< stat->ms_leaf_pages << "," << stat->ms_overflow_pages << "," << stat->ms_entries << "\n"; 
 void rai::block_store::get_mdb_stat (MDB_txn *txn)
 {
-	MDB_stat *stat;
+	MDB_stat stat;
 	
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	STDOUTSTAT(frontiers)
-	
+	STDOUTSTAT(frontiers, 		stat)
+	STDOUTSTAT(accounts, 		stat)
+	STDOUTSTAT(send_blocks, 	stat)
+	STDOUTSTAT(receive_blocks, 	stat)
+	STDOUTSTAT(open_blocks, 	stat)
+	STDOUTSTAT(change_blocks, 	stat)
+	STDOUTSTAT(state_blocks, 	stat)
+	STDOUTSTAT(pending, 		stat)
+	STDOUTSTAT(blocks_info, 	stat)
+	STDOUTSTAT(representation, 	stat)
+	STDOUTSTAT(unchecked,	 	stat)
+	STDOUTSTAT(checksum, 		stat)
+	STDOUTSTAT(vote,		 	stat)
+	STDOUTSTAT(meta, 			stat)
+
+
 }
 
