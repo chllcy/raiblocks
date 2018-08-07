@@ -255,7 +255,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 		rai::block_hash latest;
 		rai::bufferstream latest_stream (connection->receive_buffer->data () + sizeof (rai::uint256_union), sizeof (rai::uint256_union));
 		auto error2 (rai::read (latest_stream, latest));
-		BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier1: %1%  %2%") % account.to_string() % latest.to_string();
+		BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier1: %1%  %2%") % account.to_string() % latest.to_string());
 		assert (!error2);
 		if (count == 0)
 		{
@@ -277,7 +277,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 		}
 		if (!account.is_zero ())
 		{
-			BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier2: %1%  %2%") % current.to_string() % account.to_string();
+			BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier2: %1%  %2%") % current.to_string() % account.to_string());
 			while (!current.is_zero () && current < account)
 			{
 				// We know about an account they don't.
@@ -290,7 +290,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 				if (account == current)
 				{
 					rai::transaction transaction (connection->node->store.environment, nullptr, true);
-					BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier3: %1%  %2%") % latest.to_string() % info.head.to_string();
+					BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier3: %1%  %2%") % latest.to_string() % info.head.to_string());
 					if (latest == info.head)
 					{
 						// In sync
@@ -326,7 +326,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 		}
 		else
 		{
-			BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier4: %1% ") % current.to_string() ;
+			BOOST_LOG (connection->node->log) <<  boost::str (boost::format ("received_frontier4: %1% ") % current.to_string());
 			{
 				rai::transaction transaction (connection->node->store.environment, nullptr, true);
 				while (!current.is_zero ())
