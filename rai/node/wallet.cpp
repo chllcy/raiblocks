@@ -844,6 +844,7 @@ void rai::wallet_store::destroy (MDB_txn * transaction_a)
 
 std::shared_ptr<rai::block> rai::wallet::receive_action (rai::block const & send_a, rai::account const & representative_a, rai::uint128_union const & amount_a, bool generate_work_a)
 {
+	BOOST_LOG (node.log) << "rai::wallet::receive_action:" << send_a->to_json();
 	rai::account account;
 	auto hash (send_a.hash ());
 	std::shared_ptr<rai::block> block;
@@ -896,6 +897,7 @@ std::shared_ptr<rai::block> rai::wallet::receive_action (rai::block const & send
 	}
 	if (block != nullptr)
 	{
+		BOOST_LOG (node.log) << "rai::wallet::receive_action2:" << block->to_json();
 		if (rai::work_validate (*block))
 		{
 			node.work_generate_blocking (*block);
